@@ -27,7 +27,7 @@ const Mint = () => {
         width: '100%',  
       }}>
         <Typography className={cn("px-2 py-2 m-2 pixelify_sans")} variant="h4" gutterBottom component="div" sx={{ fontWeight: 'bold', pb: 2, color: 'red' }}>
-          MAKE PREDICTION
+          Make Prediction
         </Typography>
 
 
@@ -81,7 +81,7 @@ const Mint = () => {
               },
             }}
           />
-          <Button variant="outlined">MAKE PREDICTION</Button>
+          <Button variant="outlined">Make Prediction</Button>
         </Box>
 
         
