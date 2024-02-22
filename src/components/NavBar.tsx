@@ -1,13 +1,18 @@
-import React from "react";
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import cn from 'classnames'; 
 
+import firework from '/home/ub/SUI_PROJECTS/Predictrix_new/vite-project/src/assets/works.gif';
+
 
 import {ConnectButton} from '@suiet/wallet-kit';
+import '@suiet/wallet-kit/style.css';
+import '../index.css'
+
+
+
 
 
 const NavBar = () => {
@@ -15,7 +20,7 @@ const NavBar = () => {
     <AppBar position="static" sx={{ backgroundColor: '#000', elevation: 0 }}>
       <Toolbar>
         {/* Embed Giphy iframe */}
-        <iframe src="https://giphy.com/embed/jWcQLzQUa6rQc" width="480" height="252" frameBorder="0" className="giphy-embed" allowFullScreen></iframe>
+        <img src={firework} alt="Firework" style={{ maxHeight: '50%', maxWidth: '50%' }} />
         
         <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
           <Typography
@@ -27,9 +32,7 @@ const NavBar = () => {
             PREDICTRIX
           </Typography>
         </Box>
-        <Button variant="outlined" sx={{ border: '1px solid', marginRight: '8px' }}>
-          Connect Wallet
-        </Button>
+        <ConnectButton/>
       </Toolbar>
     </AppBar>
   );
