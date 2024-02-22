@@ -11,11 +11,34 @@ import Mint from "./components/Mint";
 import NavBar from "./components/NavBar";
 import Footer from './components/Footer';
 
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline'; 
+
+
+// Define the theme
+const theme = createTheme({
+  typography: {
+    fontFamily: 'PixelSans, Arial, sans-serif',
+  },
+  palette: {
+    mode: 'dark', 
+    background: {
+      default: '#000000', 
+    },
+  },
+ 
+});
+
+
+
 function App() {
   const [count, setCount] = useState(0);
 
   return (
     <div className="App">
+
+      <ThemeProvider theme={theme}>
+      <CssBaseline />
 
       <NavBar />
 
@@ -50,6 +73,7 @@ function App() {
 
       <Footer />
 
+      </ThemeProvider>
     </div>
   );
 }
