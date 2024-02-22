@@ -1,0 +1,74 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+body {
+ 
+  color: rgb(var(--foreground-rgb));
+  background-color: #000000; 
+  background-image: url('https://i.imgur.com/m8KuaOS.gif'); 
+  background-repeat: repeat; 
+  background-size: auto; 
+  background-position: top left;
+}
+
+
+.pixelify_sans {
+  font-family: var(--font-pixelify_sans);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+
+/* Animation keyframes */
+@keyframes move {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(100%); } /* Example - move horizontally */
+}
+
+
+
+/* Animated element class */
+.radcoin span {
+  width: 125px;
+  height: 125px;
+  border-radius: 50%; 
+  backface-visibility: hidden;
+  position: center;
+  animation: move 45s linear infinite;
+}
+
+.text{
+  color: gold;
+  -webkit-text-stroke: 2.5px black;
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  position:relative;
+  font-size:75px;
+  z-index: 1;
+  text-align: center;
+}
+
+.textbox{
+  display: block;
+  padding-top:70px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 40%;
+  
+}
+
+@keyframes flickerAnimation { 
+  0%   { opacity:1; }
+  50%  { opacity:0; }
+  100% { opacity:1; }
+}
+.rad {
+    opacity:1;  
+    animation: flickerAnimation 3s infinite;
+}
