@@ -36,7 +36,7 @@ const NavBar = () => {
             PREDICTRIX
           </Typography>
         </Box>
-        <ConnectButton/>
+        <ConnectButton style={{ padding: '10px 20px' }} />
       </Toolbar>
     </AppBar>
   );
