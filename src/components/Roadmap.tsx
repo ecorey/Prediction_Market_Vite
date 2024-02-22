@@ -4,6 +4,9 @@ import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import cn from 'classnames'; 
 
+import space from '/home/ub/SUI_PROJECTS/Predictrix_new/vite-project/src/assets/space.gif';
+
+
 const Roadmap = () => {
   return (
     <Box sx={{ 
@@ -20,6 +23,10 @@ const Roadmap = () => {
         Roadmap
       </Typography>
       
+      <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+        <img src={space} alt="Map" style={{ maxWidth: '100%', height: 'auto' }} />
+      </Box>
+
     </Box>
   );
 };

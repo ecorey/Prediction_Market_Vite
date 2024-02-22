@@ -47,17 +47,19 @@ function App() {
             <Grid container spacing={4} sx={{ justifyContent: 'center' }}>
               
 
-            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+              <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
                 <Tokenomics />
+              </Grid>
+
+              <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Mint />
               </Grid>
 
               <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
                 <SquareOne />
               </Grid>
               
-              <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
-                <Mint />
-              </Grid>
+              
               
               <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
                 <Roadmap />
