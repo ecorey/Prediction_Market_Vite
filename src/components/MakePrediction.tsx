@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
@@ -11,7 +10,7 @@ import { useWallet, ConnectModal } from '@suiet/wallet-kit';
 const MakePrediction = () => {
 
   const {connected} = useWallet()
-  const [showModal, setShowModal] = useState(false)
+ 
 
   if (connected) {
     return (
