@@ -29,7 +29,7 @@ const NavBar = () => {
               textAlign: 'center',
               backgroundColor: '#000000',
               textShadow: '2px 2px 4px rgba(255, 165, 0, 0.8)',
-              // Increase specificity here
+              
               '&': { backgroundColor: '#000000' },
             }} 
           >

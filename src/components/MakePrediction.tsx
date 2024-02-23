@@ -8,7 +8,7 @@ import cn from 'classnames';
 import { useWallet, ConnectModal } from '@suiet/wallet-kit';
 
 
-const Mint = () => {
+const MakePrediction = () => {
 
   const {connected} = useWallet()
   const [showModal, setShowModal] = useState(false)
@@ -64,19 +64,19 @@ const Mint = () => {
             placeholder="DEMOCRATS"
             sx={{ 
               width: 'calc(50% - 12px)',
-              backgroundColor: 'rgba(128, 128, 128, 0.6)', // Grey with 60% opacity
+              backgroundColor: 'rgba(128, 128, 128, 0.6)', 
               '& .MuiOutlinedInput-input': {
-                backgroundColor: 'rgba(128, 128, 128, 0.6)', // Ensures input field also has the background color
+                backgroundColor: 'rgba(128, 128, 128, 0.6)', 
               },
               '& .MuiOutlinedInput-root': {
                 '& fieldset': {
-                  borderColor: 'white', // Optional: changes the border color
+                  borderColor: 'white', 
                 },
                 '&:hover fieldset': {
-                  borderColor: 'white', // Optional: changes the border color on hover
+                  borderColor: 'white', 
                 },
                 '&.Mui-focused fieldset': {
-                  borderColor: 'orange', // Optional: changes the border color when focused
+                  borderColor: 'orange', 
                 },
               },
             }}
@@ -92,4 +92,4 @@ const Mint = () => {
   };
 
 
-export default Mint;
+export default MakePrediction;

@@ -1,13 +1,11 @@
-import { useState } from 'react';
-
 import './App.css';
 import { Container, Grid, Box } from '@mui/material';
 
-import SquareOne from "./components/SquareOne";
-import About from "./components/About";
-import Tokenomics from "./components/Tokenomics";
+import SquareOne from "./components/Genie";
+import About from "./components/ConfirmWinner";
+import Tokenomics from "./components/About";
 import Roadmap from "./components/Roadmap";
-import Mint from "./components/Mint";
+import Mint from "./components/MakePrediction";
 import NavBar from "./components/NavBar";
 import Footer from './components/Footer';
 
@@ -32,7 +30,7 @@ const theme = createTheme({
 
 
 function App() {
-  const [count, setCount] = useState(0);
+
 
   return (
     <div className="App">

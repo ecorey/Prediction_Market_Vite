@@ -5,7 +5,7 @@ import cn from 'classnames';
 
 import genie from '/home/ub/SUI_PROJECTS/Predictrix_new/vite-project/src/assets/giphy.gif';
 
-const SquareOne = () => {
+const Genie = () => {
   return (
     <Box sx={{ 
       display: 'flex', 
@@ -29,4 +29,4 @@ const SquareOne = () => {
   );
 };
 
-export default SquareOne;
+export default Genie;
