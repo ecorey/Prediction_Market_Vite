@@ -184,21 +184,11 @@ module predictrix::predictrix {
 
     // creates an empty transfer policy and publicly shares it
     // todo create rules for the transfer policy / add royalty rule and floor rule
-    // public fun create_empty_policy( publisher: &Publisher, ctx: &mut TxContext) {
+    public fun create_empty_policy( publisher: &Publisher, ctx: &mut TxContext) {
 
-    //     let (transfer_policy, tp_cap) = tp::new<Prediction>(publisher, ctx);
-        
-        
-    //     let registry = Registry {
-    //         id: object::new(ctx),
-    //         tp: transfer_policy,
-    //     };
+       
 
-
-    //     transfer::public_transfer(tp_cap, tx_context::sender(ctx));
-    //     transfer::public_share_object(transfer_policy);
-
-    // }
+    }
 
 
 
@@ -257,6 +247,7 @@ module predictrix::predictrix {
 
     }
 
+
     // sample test using kiosk test utils
     #[test]
     fun test_kiok() {
@@ -284,7 +275,7 @@ module predictrix::predictrix {
 
 
 // TODO
-// add transfer policy rules and fix the empty_policy function
+// add transfer policy rules and create the empty_policy function
 // add consts, asserts, and tests
 // add game elements (new, instance, finalize, ext.)
 // add table to store the prediction with an address
