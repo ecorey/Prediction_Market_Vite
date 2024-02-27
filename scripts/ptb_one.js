@@ -21,10 +21,10 @@ const acctBalance = await suiClient.getBalance({
 });
 
 
-// createTextSpanFromBounds.moveCall({
-//     target: '0x0::predictrix::make_prediction',
-//     arguments: [ ],
-// });
+txb.moveCall({
+    target: '0x0::predictrix::make_prediction',
+    arguments: [ ],
+});
 
 
 console.log(
