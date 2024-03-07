@@ -15,6 +15,7 @@ module predictrix::predictrix {
     use sui::sui::SUI;
     use sui::table::Table;
     use sui::coin::{Self, Coin};    
+    use sui::clock::{Self, Clock};
 
 
 
@@ -22,7 +23,7 @@ module predictrix::predictrix {
 
 
     // errors
-    
+    const EOutsideWindow: u64 = 0;
 
 
     // OTW for the kiosk init function
@@ -37,6 +38,13 @@ module predictrix::predictrix {
     }
 
 
+    struct Epoch has store {
+       start_time: u64,
+       end_time: u64,
+
+    }
+
+
     // game
     struct Game has key, store {
         id: UID,
@@ -45,16 +53,25 @@ module predictrix::predictrix {
         price: u64,
         prev_id: Option<ID>,    
         cur_id: ID,
+        result: u64,
+        predict_epoch: Epoch,
+        report_epoch: Epoch,
+        
 
     }
+
+    // report winner within timeframe by ref , add event
+    public fun report_winner(prediction: &Prediction, game: &mut Game, clock: &Clock ) {
+        assert!(clock::timestamp_ms(clock) > game.predict_epoch.start_time, EOutsideWindow);
+        assert!(clock::timestamp_ms(clock) < game.predict_epoch.end_time, EOutsideWindow);
+    } 
+
 
 
     struct GameInstance has key, store {
         id: UID,
+        game_id: ID,
         balance: Balance<SUI>,
-        pick1: Table<u64, address >,
-        pick2: Table<u64, address >,
-        
         
     }
 
@@ -71,9 +88,9 @@ module predictrix::predictrix {
 
     // event emitted when a prediction is made
     // add ID to the event to connect to the prediction
+    // user only needs to predict the repub and dem can be caluculated from the total count
     struct PredictionMade has copy, drop {
-        demo_event: Option<String>,
-        repub_event: Option<String>,
+        prediction: Option<u64>,
         made_by: address,
     }
 
@@ -90,11 +107,12 @@ module predictrix::predictrix {
     // the prediction struct
     struct Prediction has key, store {
         id: UID,
-        image_url: String,
-        demo: Option<String>,
-        repub: Option<String>,
+        prediction: Option<u64>,
+        timestamp: u64,
         
     }
+
+
 
 
 
@@ -141,18 +159,18 @@ module predictrix::predictrix {
 
 
     // mint a prediction in a prediction wrapper and emit the event
-    public fun make_prediction(demo: String, repub: String, image_url: String, ctx: &mut TxContext) : PredictionWrapper{
+    public fun make_prediction(predict: u64, clock: &Clock, ctx: &mut TxContext) : PredictionWrapper{
         event::emit(PredictionMade {
-            demo_event: option::some(demo),
-            repub_event: option::some(repub),
+            prediction: option::some(predict),
             made_by: tx_context::sender(ctx),
         });
 
+        
+
         let prediction = Prediction {
             id: object::new(ctx),
-            image_url,
-            demo: option::some(demo),
-            repub: option::some(repub),
+            prediction: option::some(predict),
+            timestamp: clock::timestamp_ms(clock),
         };
 
         PredictionWrapper {
@@ -200,7 +218,7 @@ module predictrix::predictrix {
         let ( prediction, transfer_request)  = kiosk::purchase_with_cap<Prediction>(kiosk, purchase_cap, coin::zero<SUI>(ctx));
         confirm_request<Prediction>( &registry.tp, transfer_request  );
 
-        let Prediction {id, image_url: _, demo: _, repub: _} = prediction;
+        let Prediction {id, prediction: _, timestamp: _} = prediction;
         object::delete(id);
 
     }
@@ -208,77 +226,92 @@ module predictrix::predictrix {
 
 
 
-
-
+ 
 
 
 
 
     //TESTS
     // test the prediction kiosk
-    #[test_only]
-    fun test_prediction_kiosk() {
+    #[test_only] use sui::test_scenario;
+    
 
-        use sui::test_scenario;
-        use sui::coin;
+    #[test]
+    public fun test_init() {
+
+        let admin = @0x1;
+        let scenario = test_scenario::begin(admin);
+        let scenario_val = &mut scenario;
+
+        let otw = KIOSK_PRACTICE_TWO {};
+
+
+        {
+            // `test_scenario::ctx` returns the `TxContext`
+            let ctx = test_scenario::ctx(scenario_val);
+            init(otw, ctx);
+            
+            // let game_owner_cap = test_scenario::take_from_sender<GameOwnerCap>(&scenario);
+            // test_scenario::return_to_sender(&scenario, game_owner_cap);
+            
+        };
 
 
         
-
-        let admin = @0xABC;
-        let user = @0xDEF;
-
-
-        let scenario_val = test_scenario::begin(admin);
-        let scenario = &mut scenario_val;
         {
+            // let ctx = test_scenario::ctx(scenario_val);
+            // let prediction = 444;
+            // let clock = clock::create_for_testing(ctx);
             
-            
-        };
-
-       
-        test_scenario::next_tx(scenario, admin );
-        {
+            // make_prediction(prediction, &clock, ctx);
+           
 
         };
 
 
-        test_scenario::end(scenario_val);
+        test_scenario::end(scenario);   
 
     }
 
-
-    // sample test using kiosk test utils
-    #[test]
-    fun test_kiok() {
-
-         use sui::kiosk_test_utils::{Self, Asset};
+   
 
 
-        let ctx = &mut kiosk_test_utils::ctx();
-        let ( kiosk, owner_cap) = kiosk_test_utils::get_kiosk(ctx);
 
-        let old_owner = kiosk::owner(&kiosk);
-        kiosk::set_owner(&mut kiosk, &owner_cap, ctx);
-        assert!(kiosk::owner(&kiosk) == old_owner, 0);
 
-        kiosk::set_owner_custom(&mut kiosk, &owner_cap, @0x0333);
-        assert!(kiosk::owner(&kiosk) != old_owner, 0);
-        assert!(kiosk::owner(&kiosk) == @0x0333, 0);
 
-        kiosk_test_utils::return_kiosk(kiosk, owner_cap, ctx);
-    }
 
+
+
+
+
+
+
+
+   
 
 }
 
 
 
 // TODO
+
+
+ 
+// user gets predictin with timeline and winenr claims within a timeperiod 
+
+// dont use shared object let user claim
+
+// time windows 
+
+
+// vector to hold values
+// only need one value as a + b = 538
+// add timestamp to the prediction
+// create game_data struct that is a shared object and holds vector of predictions
 // add transfer policy rules and create the empty_policy function
 // add consts, asserts, and tests
 // add game elements (new, instance, finalize, ext.)
-// add table to store the prediction with an address
+// add table to store the predictions with an address
 // add switchboard oracle prototype
 // ptb for making predictions
 
