@@ -99,7 +99,9 @@ module predictrix::predictrix {
     // wrapper for the prediction to keep it in the kiosk
     struct PredictionWrapper has key {
         id: UID, 
-        prediction: Prediction,
+        kiosk: Kiosk,
+        kiosk_owner_cap: KioskOwnerCap,
+        // prediction: Prediction,
     }
 
 
@@ -159,7 +161,9 @@ module predictrix::predictrix {
 
 
     // mint a prediction in a prediction wrapper and emit the event
-    public fun make_prediction(predict: u64, clock: &Clock, ctx: &mut TxContext) : PredictionWrapper{
+    public fun make_prediction(predict: u64, clock: &Clock, _tp: &TransferPolicy<Prediction> , ctx: &mut TxContext) : PredictionWrapper{
+        
+        
         event::emit(PredictionMade {
             prediction: option::some(predict),
             made_by: tx_context::sender(ctx),
@@ -173,30 +177,43 @@ module predictrix::predictrix {
             timestamp: clock::timestamp_ms(clock),
         };
 
+
+
+        let (kiosk, kiosk_owner_cap) = kiosk::new(ctx);
+
+        // place and lock item into the kiosk
+        kiosk::lock(&mut kiosk, &kiosk_owner_cap, _tp, prediction);
+       
+
+        // wrapper is retuned to the user with the item locked in the kiosk
+        // the prediction is not included in the prediction wrapper becasue its locked in teh kiosk
         PredictionWrapper {
             id: object::new(ctx),
-            prediction
+            kiosk: kiosk,
+            kiosk_owner_cap: kiosk_owner_cap,
+            
         }
+
+
+
+
     }
 
 
 
     // unwraps prediction and locks the kiosk
-    public fun unwrap(
+    // public fun unwrap(
+    //     prediction_wrapper: PredictionWrapper, 
+    //     ctx: &mut TxContext
+    // ) {
+    //     let PredictionWrapper { id, prediction, kiosk, kiosk_owner_cap} = prediction_wrapper;
 
-        prediction_wrapper: PredictionWrapper, 
-        kiosk: &mut Kiosk, 
-        kiosk_cap: &KioskOwnerCap, 
-        _tp: &TransferPolicy<Prediction>
-        ) 
-        {
+        
+    //     kiosk::lock(&mut kiosk, &kiosk_owner_cap, &_tp, &prediction);
 
-        let PredictionWrapper { id, prediction } = prediction_wrapper;
-
-
-        object::delete(id);
-        kiosk::lock(kiosk, kiosk_cap, _tp, prediction);
-    }
+        
+    //     object::delete(id); 
+    // }
 
 
 
@@ -232,14 +249,15 @@ module predictrix::predictrix {
 
 
     //TESTS
-    // test the prediction kiosk
-    #[test_only] use sui::test_scenario;
     
-
     #[test]
     public fun test_init() {
 
+        use sui::test_scenario;
+
+
         let admin = @0x1;
+        let user1 = @0x2;
         let scenario = test_scenario::begin(admin);
         let scenario_val = &mut scenario;
 
@@ -247,28 +265,51 @@ module predictrix::predictrix {
 
 
         {
-            // `test_scenario::ctx` returns the `TxContext`
-            let ctx = test_scenario::ctx(scenario_val);
-            init(otw, ctx);
             
-            // let game_owner_cap = test_scenario::take_from_sender<GameOwnerCap>(&scenario);
-            // test_scenario::return_to_sender(&scenario, game_owner_cap);
+            init(otw, test_scenario::ctx(scenario_val));
+            
             
         };
+
+
+         test_scenario::next_tx(scenario_val, admin);
+        {
+            
+            let ctx = test_scenario::ctx(scenario_val);
+            let sender_address = tx_context::sender(ctx);
+            assert!(sender_address == admin, 0);
+
+            let game_owner_cap = test_scenario::take_from_sender<GameOwnerCap>(scenario_val);
+            test_scenario::return_to_sender(scenario_val, game_owner_cap);
+            
+        };
+
+
+
+        // test_scenario::next_tx(scenario_val, user1);
+        // {
+            
+            // let prediction = 444;
+            // let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
+            
+        
+            // let wrapper = make_prediction(prediction, &clock, test_scenario::ctx(scenario_val));
+            
+            // let kiosk: &mut Kiosk; 
+            // let kiosk_cap: &KioskOwnerCap; 
+            // let tp: &TransferPolicy<Prediction>; 
+
+        
+            // unwrap(wrapper, kiosk, kiosk_cap, tp);
+
+            // clock::destroy_for_testing(clock);
+        // };
 
 
         
-        {
-            // let ctx = test_scenario::ctx(scenario_val);
-            // let prediction = 444;
-            // let clock = clock::create_for_testing(ctx);
-            
-            // make_prediction(prediction, &clock, ctx);
-           
-
-        };
-
-
+       
+        
+        
         test_scenario::end(scenario);   
 
     }
@@ -278,16 +319,6 @@ module predictrix::predictrix {
 
 
 
-
-
-
-
-
-
-
-
-
-   
 
 }
 

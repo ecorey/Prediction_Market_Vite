@@ -1,15 +1,47 @@
+// Import necessary libraries and components
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
-import TextField from "@mui/material/TextField"; 
+import TextField from "@mui/material/TextField";
 import cn from 'classnames'; 
+import { useWallet } from '@suiet/wallet-kit';
 
-import { useWallet, ConnectModal } from '@suiet/wallet-kit';
+import { TransactionBlock } from '@mysten/sui.js/transactions';
+
+
+
+const txb = new TransactionBlock();
+
 
 
 const MakePrediction = () => {
 
-  const {connected} = useWallet()
+  const { connected } = useWallet();
+
+
+
+  const handlePrediction = async () => {
+    const demoInput = document.getElementById('input-a') as HTMLInputElement;
+    const repubInput = document.getElementById('input-b') as HTMLInputElement;
+    if (demoInput && repubInput) {
+      const demoValue = demoInput.value;
+      const repubValue = repubInput.value;
+
+
+      
+      txb.moveCall({
+        target: '0x0::predictrix::make_prediction',
+        arguments: [
+          { index: 0, kind: "Input", type: "pure", value: demoValue },
+          { index: 1, kind: "Input", type: "pure", value: repubValue }
+        ],
+      });
+      
+    }
+  };
+
+
+
  
 
   if (connected) {
@@ -25,70 +57,24 @@ const MakePrediction = () => {
         m: 1, 
         width: '100%',  
       }}>
-        <Typography className={cn("px-2 py-2 m-2 pixelify_sans")} variant="h4" gutterBottom component="div" sx={{ fontWeight: 'bold', pb: 2, color: 'red' }}>
+        <Typography className={cn("px-2 py-2 m-2 pixelify_sans")} variant="h4" gutterBottom>
           Make Prediction
         </Typography>
 
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, pb: 2 }}>
-          <TextField
-            id="input-a"
-            variant="outlined"
-            placeholder="REPUBLICANS"
-            sx={{ 
-              width: 'calc(50% - 12px)',
-              backgroundColor: 'rgba(128, 128, 128, 0.6)',
-              '& .MuiOutlinedInput-input': {
-                backgroundColor: 'rgba(128, 128, 128, 0.6)', 
-              },
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': {
-                  borderColor: 'white', 
-                },
-                '&:hover fieldset': {
-                  borderColor: 'white', 
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: 'orange', 
-                },
-              },
-            }}
-          />
-          <Typography variant="h6" component="span">
-            /
-          </Typography>
-          <TextField
-            id="input-b"
-            variant="outlined"
-            placeholder="DEMOCRATS"
-            sx={{ 
-              width: 'calc(50% - 12px)',
-              backgroundColor: 'rgba(128, 128, 128, 0.6)', 
-              '& .MuiOutlinedInput-input': {
-                backgroundColor: 'rgba(128, 128, 128, 0.6)', 
-              },
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': {
-                  borderColor: 'white', 
-                },
-                '&:hover fieldset': {
-                  borderColor: 'white', 
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: 'orange', 
-                },
-              },
-            }}
-          />
-          <Button variant="outlined">Make Prediction</Button>
-        </Box>
 
-        
-        
+          
+          <TextField id="input-a" variant="outlined" placeholder="REPUBLICANS" />
+          <Typography variant="h6">/</Typography>
+          <TextField id="input-b" variant="outlined" placeholder="DEMOCRATS" />
+
+          <Button variant="outlined" onClick={handlePrediction}>Make Prediction</Button>
+
+        </Box>
       </Box>
     );
   }
-  };
-
+};
 
 export default MakePrediction;
