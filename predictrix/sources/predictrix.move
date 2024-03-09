@@ -4,7 +4,7 @@ module predictrix::predictrix {
     use sui::kiosk::{Self, Kiosk, KioskOwnerCap};
     use sui::object::{Self, UID, ID};
     use sui::transfer;
-    use sui::transfer_policy::{Self as tp, TransferPolicy, confirm_request};
+    use sui::transfer_policy::{Self as tp, TransferPolicy, TransferPolicyCap, TransferRequest, confirm_request, add_rule, new_request};
     use sui::tx_context::{TxContext, Self};
     use sui::package::{Self, Publisher};    
     use std::string::{String};
@@ -16,6 +16,9 @@ module predictrix::predictrix {
     use sui::table::Table;
     use sui::coin::{Self, Coin};    
     use sui::clock::{Self, Clock};
+    // use sui::royalty_rule::{add};
+    
+    
 
 
 
@@ -26,18 +29,19 @@ module predictrix::predictrix {
     const EOutsideWindow: u64 = 0;
 
 
-    // OTW for the kiosk init function
+    // OTW for the init function
     struct PREDICTRIX has drop {}
     
 
 
 
-    // game owner cap
+    // game owner cap that goes to sender of the init function
     struct GameOwnerCap has key {
         id: UID,
     }
 
 
+    // struct to hold game times
     struct Epoch has store {
        start_time: u64,
        end_time: u64,
@@ -45,7 +49,7 @@ module predictrix::predictrix {
     }
 
 
-    // game
+    // game struct
     struct Game has key, store {
         id: UID,
         coin: String,
@@ -60,34 +64,22 @@ module predictrix::predictrix {
 
     }
 
-    // report winner within timeframe by ref , add event
-    public fun report_winner(prediction: &Prediction, game: &mut Game, clock: &Clock ) {
-        assert!(clock::timestamp_ms(clock) > game.predict_epoch.start_time, EOutsideWindow);
-        assert!(clock::timestamp_ms(clock) < game.predict_epoch.end_time, EOutsideWindow);
-    } 
+    
 
-
-
+    // struct to hold a game instance
     struct GameInstance has key, store {
         id: UID,
         game_id: ID,
-        balance: Balance<SUI>,
+        game_inst: Option<Game>,
         
     }
 
 
 
-    // registry for transfer policy
-    struct Registry has key {
-        id: UID, 
-        tp: TransferPolicy<Prediction>,
-    }
-    
     
 
 
     // event emitted when a prediction is made
-    // add ID to the event to connect to the prediction
     // user only needs to predict the repub and dem can be caluculated from the total count
     struct PredictionMade has copy, drop {
         prediction: Option<u64>,
@@ -96,19 +88,11 @@ module predictrix::predictrix {
 
 
 
-    // wrapper for the prediction to keep it in the kiosk
-    struct PredictionWrapper has key {
-        id: UID, 
-        kiosk: Kiosk,
-        kiosk_owner_cap: KioskOwnerCap,
-        // prediction: Prediction,
-    }
-
-
 
     // the prediction struct
     struct Prediction has key, store {
         id: UID,
+        prediction_id: ID,
         prediction: Option<u64>,
         timestamp: u64,
         
@@ -117,20 +101,37 @@ module predictrix::predictrix {
 
 
 
+    // registry that will hold the transfer policy
+    struct Registry has key, store {
+        id: UID, 
+        tp: TransferPolicy<Prediction>,
+    }
+    
 
 
-    // init to make the transfer policy a shared object 
-    // and transfer the game owner cap to the sender
+
+
+    // init creates the transfer policy and stores it in the regisry which is a shared object 
+    // and transfers the transfer policy cap and game owner cap to the sender
     fun init(otw: PREDICTRIX, ctx: &mut TxContext) {
+
+        
+
         let publisher = package::claim(otw, ctx);
 
 
         let ( transfer_policy, tp_cap ) = tp::new<Prediction>(&publisher, ctx);
 
+        
+        let registry = Registry {
+            id: object::new(ctx),
+            tp: transfer_policy,
+        };
+
         transfer::public_transfer(publisher, tx_context::sender(ctx));
         transfer::public_transfer(tp_cap, tx_context::sender(ctx));
-
-        transfer::public_share_object(transfer_policy);
+        transfer::public_share_object(registry);
+        
 
         transfer::transfer(GameOwnerCap {
             id: object::new(ctx),
@@ -140,6 +141,16 @@ module predictrix::predictrix {
 
 
 
+    // public fun add_royality_to_policy(
+    //     policy: &mut TransferPolicy<Prediction>, 
+    //     cap: &TransferPolicyCap<Prediction>,
+    //     amount_bp: u16,
+    //     min_amount: u64
+    //     ){
+            
+    //     royalty_rule::add(policy, cap, amount_bp, min_amount);
+
+    // }
 
 
     // create a new game
@@ -156,12 +167,18 @@ module predictrix::predictrix {
 
 
 
+    // creates a new kiosk for a user that can hold the predictions 
+    // and returns the kiosk and the kiosk owner cap
+    public fun create_kiosk(ctx: &mut TxContext) : (Kiosk, KioskOwnerCap) {
+        let (kiosk, kiosk_owner_cap) = kiosk::new(ctx);
+        (kiosk, kiosk_owner_cap)
+    }
 
 
 
 
-    // mint a prediction in a prediction wrapper and emit the event
-    public fun make_prediction(predict: u64, clock: &Clock, _tp: &TransferPolicy<Prediction> , ctx: &mut TxContext) : PredictionWrapper{
+    // makes a prediction and locks it in the users kiosk and emits an event for the prediction
+    public fun make_prediction(kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, predict: u64, clock: &Clock, _tp: &TransferPolicy<Prediction>, ctx: &mut TxContext)  {
         
         
         event::emit(PredictionMade {
@@ -169,77 +186,40 @@ module predictrix::predictrix {
             made_by: tx_context::sender(ctx),
         });
 
-        
+        let id = object::new(ctx);
+        let prediction_id = object::uid_to_inner(&id);
 
         let prediction = Prediction {
-            id: object::new(ctx),
+            id, 
+            prediction_id,
             prediction: option::some(predict),
             timestamp: clock::timestamp_ms(clock),
         };
 
 
-
-        let (kiosk, kiosk_owner_cap) = kiosk::new(ctx);
-
-
         // place and lock item into the kiosk
-        kiosk::lock(&mut kiosk, &kiosk_owner_cap, _tp, prediction);
+        kiosk::lock(kiosk, kiosk_owner_cap, _tp, prediction);
        
 
-        // wrapper is retuned to the user with the item locked in the kiosk
-        // the prediction is not included in the prediction wrapper becasue its locked in teh kiosk
-        PredictionWrapper {
-            id: object::new(ctx),
-            kiosk: kiosk,
-            kiosk_owner_cap: kiosk_owner_cap,
-            
-        }
-
-
-    }
-
-
-
-    // unwraps prediction and returns the kiosk and kiosk owner cap
-    public fun unwrap(
-        prediction_wrapper: PredictionWrapper, 
-        ctx: &mut TxContext
-    ) : (Kiosk, KioskOwnerCap) {
-        let PredictionWrapper { id, kiosk, kiosk_owner_cap} = prediction_wrapper;
         
-        object::delete(id); 
+    }
 
-        (kiosk, kiosk_owner_cap)
+
+    // burns the prediction from the kiosk and deletes the prediction
+    public fun burn_from_kiosk( kiosk: &mut Kiosk, kiosk_cap: &KioskOwnerCap, prediction_id: ID, registry: &mut Registry, ctx: &mut TxContext) {
+
+        let purchase_cap = kiosk::list_with_purchase_cap<Prediction>( kiosk, kiosk_cap, prediction_id, 0, ctx); 
+        let ( prediction, transfer_request)  = kiosk::purchase_with_cap<Prediction>(kiosk, purchase_cap, coin::zero<SUI>(ctx));
+        tp::confirm_request<Prediction>( &registry.tp, transfer_request  );
+
+        let Prediction {id, prediction_id: _, prediction: _, timestamp: _} = prediction;
+        object::delete(id);
+
     }
 
 
 
-    // creates an empty transfer policy and publicly shares it
-    // todo create rules for the transfer policy / add royalty rule and floor rule
-    public fun create_empty_policy( publisher: &Publisher, ctx: &mut TxContext) {
-
-       
-
-    }
-
-
-
-
-
-    // public fun burn_from_kiosk( kiosk: &mut Kiosk, kiosk_cap: &KioskOwnerCap, prediction_id: ID, registry: &mut Registry, ctx: &mut TxContext) {
-
-        // let purchase_cap = kiosk::list_with_purchase_cap<Prediction>( kiosk, kiosk_cap, prediction_id, 0, ctx); 
-        // let ( prediction, transfer_request)  = kiosk::purchase_with_cap<Prediction>(kiosk, purchase_cap, coin::zero<SUI>(ctx));
-        // confirm_request<Prediction>( &registry.tp, transfer_request  );
-
-        // let Prediction {id, prediction: _, timestamp: _} = prediction;
-        // object::delete(id);
-
-    // }
-
-
-
-
+    // lists the prediction in the kiosk for sale
     public fun list_prediction<T: key + store>(
         kiosk: &mut Kiosk, 
         kiosk_cap: &KioskOwnerCap, 
@@ -251,6 +231,7 @@ module predictrix::predictrix {
 
 
 
+    // delists the prediction from the kiosk
     public fun delist_prediction<T: key + store>(
         kiosk: &mut Kiosk,
         kiosk_cap: &KioskOwnerCap,
@@ -261,6 +242,43 @@ module predictrix::predictrix {
 
 
 
+    // purchase a prediction from another user
+    public fun purchase_prediction<T: key + store>(
+        kiosk: &mut Kiosk,
+        prediction_id: ID,
+        payment: Coin<SUI>
+        
+    ) : (Prediction, TransferRequest<Prediction>) {
+
+        kiosk::purchase<Prediction>(kiosk, prediction_id, payment)
+    }
+
+
+
+    // claim the winner within timeframe by ref, add event to mark the winner
+    public fun report_winner(prediction: &Prediction, game: &mut Game, clock: &Clock ) {
+        assert!(clock::timestamp_ms(clock) > game.predict_epoch.start_time, EOutsideWindow);
+        assert!(clock::timestamp_ms(clock) < game.predict_epoch.end_time, EOutsideWindow);
+    } 
+
+
+
+    
+    // withdraw balance functions
+    // from the kiosk and the game
+
+
+
+
+
+    // switchboard oracle prototype to pull the final results
+
+
+
+
+
+
+    // clean up functions
 
 
 
@@ -272,7 +290,9 @@ module predictrix::predictrix {
     public fun test_init() {
 
         use sui::test_scenario;
-
+        use sui::test_utils;
+        use sui::kiosk_test_utils::{Self as test, Asset};
+        use std::debug;
 
         let admin = @0x1;
         let user1 = @0x2;
@@ -281,7 +301,7 @@ module predictrix::predictrix {
 
         let otw = KIOSK_PRACTICE_TWO {};
 
-
+        // test the init function
         {
             
             init(otw, test_scenario::ctx(scenario_val));
@@ -289,8 +309,8 @@ module predictrix::predictrix {
             
         };
 
-
-         test_scenario::next_tx(scenario_val, admin);
+        // test the sender has the game owner cap 
+        test_scenario::next_tx(scenario_val, admin);
         {
             
             let ctx = test_scenario::ctx(scenario_val);
@@ -303,25 +323,50 @@ module predictrix::predictrix {
         };
 
 
+        // test making a prediction
+        // TODO
+        // fix the transfer policy in the test then test for the prediction
+        test_scenario::next_tx(scenario_val, admin);
+        {
+            // setup
+            let guess = 444;
 
-        // test_scenario::next_tx(scenario_val, user1);
-        // {
-            
-            // let prediction = 444;
-            // let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
-            
-        
-            // let wrapper = make_prediction(prediction, &clock, test_scenario::ctx(scenario_val));
-            
-            // let kiosk: &mut Kiosk; 
-            // let kiosk_cap: &KioskOwnerCap; 
-            // let tp: &TransferPolicy<Prediction>; 
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
 
-        
-            // unwrap(wrapper, kiosk, kiosk_cap, tp);
+            let coin = coin::mint_for_testing<SUI>(100, test_scenario::ctx(scenario_val));
+            
+            let (kiosk, kiosk_owner_cap) = test::get_kiosk(test_scenario::ctx(scenario_val));
 
-            // clock::destroy_for_testing(clock);
-        // };
+            let publisher = test::get_publisher(test_scenario::ctx(scenario_val));
+
+            
+
+
+            std::debug::print(&clock);
+            
+            
+
+            // MAKE PREDICTION AND BURN PREDICTION
+            // make_prediction(&mut kiosk, &kiosk_owner_cap, guess, &clock, &transfer_policy, test_scenario::ctx(scenario_val));
+            // burn_from_kiosk( kiosk, kiosk_owner_cap, prediction_id, registry, test_scenario::ctx(scenario_val));
+
+
+
+
+
+
+            // CLEANUP 
+
+            transfer::public_transfer(coin, admin);
+
+            test::return_publisher(publisher);
+
+            test::return_kiosk(kiosk, kiosk_owner_cap, test_scenario::ctx(scenario_val));
+           
+            
+
+            clock::destroy_for_testing(clock);
+        };
 
 
         
@@ -342,25 +387,16 @@ module predictrix::predictrix {
 
 
 
-// TODO
+
 
 
  
-// user gets predictin with timeline and winenr claims within a timeperiod 
-
-// dont use shared object let user claim
-
-// time windows 
 
 
-// vector to hold values
+
 // only need one value as a + b = 538
-// add timestamp to the prediction
-// create game_data struct that is a shared object and holds vector of predictions
 // add transfer policy rules and create the empty_policy function
 // add consts, asserts, and tests
-// add game elements (new, instance, finalize, ext.)
-// add table to store the predictions with an address
 // add switchboard oracle prototype
 // ptb for making predictions
 
