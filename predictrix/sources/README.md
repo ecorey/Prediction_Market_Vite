@@ -3,6 +3,7 @@ OUTLINE
 
 
 The structure of the program is as follows:
+    
     1. GAME LOGIC
     2. INIT / TRANSFER POLICY LOGIC
     3. PREDICTION LOGIC
