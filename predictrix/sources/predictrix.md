@@ -1,6 +1,6 @@
-####################################################
-###################  OUTLINE #######################
-####################################################
+
+OUTLINE 
+
 
 The structure of the program is as follows:
     1. GAME LOGIC
@@ -68,9 +68,9 @@ The structure of the program is as follows:
 
 
 
-####################################################
-###################  FLOW ##########################
-####################################################
+
+  FLOW 
+
 
 when the init function is called, it creates the transfer policy and stores it in the regisry which is a shared object
 and transfers the transfer policy cap and game owner cap to the sender
@@ -80,6 +80,3 @@ the predictions are held and locked in a users kiosk and they can be listed/ del
 the game owner cap is used to close the game and allow the claim the winner function to be called
 the winner can then claim the pot and the game instance is deleted
 
-####################################################
-####################################################
-####################################################
