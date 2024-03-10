@@ -18,12 +18,16 @@ module predictrix::predictrix {
     use sui::clock::{Self, Clock};
 
     use predictrix::royalty_policy;
+
+    use predictrix::switchboard_oracle::{Self, AggregatorInfo};
+    use switchboard::aggregator::{Self, Aggregator};
     
 
 
     
     // errors
     const EOutsideWindow: u64 = 0;
+    const EIncorrectPrediction: u64 = 1;
 
     
 
@@ -32,18 +36,19 @@ module predictrix::predictrix {
     // ############GAME LOGIC############
     // ################################## 
 
-    // game owner cap that goes to sender of the init function
-    struct GameOwnerCap has key {
-        id: UID,
+    // struct to hold game times
+    struct Epoch has key, store {
+       id: UID,
+       start_time: u64,
+       end_time: u64,
+
     }
 
 
 
-    // struct to hold game times
-    struct Epoch has store {
-       start_time: u64,
-       end_time: u64,
-
+    // game owner cap that goes to sender of the init function
+    struct GameOwnerCap has key {
+        id: UID,
     }
 
 
@@ -65,8 +70,8 @@ module predictrix::predictrix {
     // struct to hold a game instance
     struct GameInstance has key, store {
         id: UID,
-        balance: Balance<SUI>, // holds the balance of the game instance, init to zero
-        result: u64,  // will hold the result from the switchboard oracle, initialize to zero / add update function
+        pot: Balance<SUI>, // holds the balance of the game instance, init to zero
+        result: Option<u64>,  // will hold the result from the switchboard oracle, initialize to zero / add update function
         predict_epoch: Epoch, // start and end time for predictions
         report_epoch: Epoch, // start and end time for reporting the winner
         
@@ -74,12 +79,21 @@ module predictrix::predictrix {
 
 
 
+    // event emitted when a winner is reported  
+    struct Winner has copy, drop {
+        prediction: Option<u64>,
+        made_by: address,
+        time: u64,
+    }
+
+
+
     // create a new game instance
-    public fun new_instance(predict_epoch: Epoch, report_epoch: Epoch, ctx: &mut TxContext) : GameInstance {
+    fun new_instance(predict_epoch: Epoch, report_epoch: Epoch, ctx: &mut TxContext) : GameInstance {
         GameInstance {
             id: object::new(ctx),
-            balance: balance::zero<SUI>(),
-            result: 0,
+            pot: balance::zero<SUI>(),
+            result: option::none(),
             predict_epoch,
             report_epoch,
         }
@@ -88,26 +102,114 @@ module predictrix::predictrix {
 
 
     // create a new game
-    public fun new_game() {
+    fun new_game(instance: &GameInstance, coin: String, price: u64, ctx: &mut TxContext) : Game {
+        Game {
+            id: object::new(ctx),
+            balance: balance::zero<SUI>(),
+            coin,
+            price,
+            prev_id: option::none(),
+            cur_id: object::id(instance),
+        }
 
     }
 
 
 
     // startst the game and allows predictions to be made
-    public fun start_game() {
+    public fun start_game(_: &GameOwnerCap, coin: String, price: u64, predict_epoch: Epoch, report_epoch: Epoch, ctx: &mut TxContext)  {
+
+        let instance = new_instance(predict_epoch, report_epoch, ctx);
+        let game = new_game(&instance, coin, price, ctx);
+        
+        transfer::share_object(game);
+        transfer::share_object(instance);
+
 
     }
 
 
 
     // close the game and allows the report winner function to be called
-    public fun close_game() {
+    public fun close_game(_: &GameOwnerCap, game_instance: GameInstance, aggregator: &Aggregator, ctx: &mut TxContext) : (Balance<SUI>) {
+        
+        assert!(game_instance.predict_epoch.end_time < tx_context::epoch(ctx), EOutsideWindow);
+        
+        // let result =  switchboard_oracle::save_aggregator_info(aggregator, ctx);
+        // game_instance.result = option::some(result);
+
+        let bal_all = balance::withdraw_all(&mut game_instance.pot);
+
+        let winning_pot = coin::from_balance(bal_all, ctx);
+
+        transfer::public_transfer(winning_pot, tx_context::sender(ctx));
+
+        let GameInstance { id, pot, result: _, predict_epoch, report_epoch} = game_instance;
+        object::delete(id);
+
+
+        let Epoch { id, start_time: _, end_time: _} = predict_epoch;
+        object::delete(id);
+
+
+        let Epoch { id, start_time: _, end_time: _} = report_epoch;
+        object::delete(id);
+
+        
+        
+        (pot)
 
     }
 
 
-    
+
+    fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext)  {
+        
+        let predict_epoch  = Epoch {
+            id: object::new(ctx),
+            start_time,
+            end_time,
+        };
+
+        transfer::transfer(predict_epoch, tx_context::sender(ctx));
+
+    }
+
+
+
+    fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) {
+        
+        let report_epoch  = Epoch {
+            id: object::new(ctx),
+            start_time,
+            end_time,
+        };
+
+        transfer::transfer(report_epoch, tx_context::sender(ctx));
+
+    }
+
+
+    // claim the winner within timeframe by ref, add event to mark the winner
+    public fun report_winner(prediction: &Prediction, game: &Game, game_instance: &GameInstance, clock: &Clock, ctx: &mut TxContext ) {
+        assert!(clock::timestamp_ms(clock) > game_instance.predict_epoch.start_time, EOutsideWindow);
+        assert!(clock::timestamp_ms(clock) < game_instance.predict_epoch.end_time, EOutsideWindow);
+
+        assert!(clock::timestamp_ms(clock) > game_instance.report_epoch.start_time, EOutsideWindow);
+        assert!(clock::timestamp_ms(clock) < game_instance.report_epoch.end_time, EOutsideWindow);
+
+        assert!(prediction.prediction == game_instance.result, EIncorrectPrediction);
+
+
+        if(prediction.prediction == game_instance.result) {
+            event::emit(Winner {
+                prediction: prediction.prediction,
+                made_by: tx_context::sender(ctx),
+                time: clock::timestamp_ms(clock),
+            });
+        }
+    } 
+
     
 
 
@@ -296,23 +398,18 @@ module predictrix::predictrix {
 
 
 
-    // claim the winner within timeframe by ref, add event to mark the winner
-    public fun report_winner(prediction: &Prediction, game: &mut GameInstance, clock: &Clock ) {
-        assert!(clock::timestamp_ms(clock) > game.predict_epoch.start_time, EOutsideWindow);
-        assert!(clock::timestamp_ms(clock) < game.predict_epoch.end_time, EOutsideWindow);
-    } 
-
+    
 
 
     // withdraw from a personal kiosk
-    public fun withdraw_from_kiosk(kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, amount: Option<u64>, ctx: &mut TxContext) : Coin<SUI> {
+    public fun withdraw_balance_from_kiosk(kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, amount: Option<u64>, ctx: &mut TxContext) : Coin<SUI> {
         kiosk::withdraw(kiosk, kiosk_owner_cap, amount, ctx)
     }
 
 
 
     // withdraw from the transfer policy
-    public fun withdraw_from_tranfer_policy( transfer_policy: &mut TransferPolicy<Prediction>, transfer_policy_cap: &TransferPolicyCap<Prediction>, amount: Option<u64>, ctx: &mut TxContext ) : Coin<SUI> {
+    public fun withdraw_balance_from_tranfer_policy( transfer_policy: &mut TransferPolicy<Prediction>, transfer_policy_cap: &TransferPolicyCap<Prediction>, amount: Option<u64>, ctx: &mut TxContext ) : Coin<SUI> {
         tp::withdraw(transfer_policy, transfer_policy_cap, amount, ctx)
     }
 
