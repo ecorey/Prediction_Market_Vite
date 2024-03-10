@@ -46,9 +46,9 @@ The structure of the program is as follows:
     - function that creates a new kiosk for a user that can hold the predictions
     - function that burns the prediction from the kiosk and deletes the prediction
     - function that lists the prediction in the kiosk for sale
-    - functioin that delists the prediction from the kiosk
+    - function that delists the prediction from the kiosk
     - function to purchase a prediction from another user
-    - funciton to withdraw from a personal kiosk
+    - function to withdraw from a personal kiosk
     - function to withdraw from the transfer policy
 
 
