@@ -1,5 +1,88 @@
-module predictrix::predictrix {
+// ####################################################
+// ###################  OUTLINE #######################
+// ####################################################
 
+// The structure of the program is as follows:
+// 1. GAME LOGIC
+// 2. INIT / TRANSFER POLICY LOGIC
+// 3. PREDICTION LOGIC
+// 4. KIOSK LOGIC
+// 5. WITHDRAW FUNCTIONS
+// 6. TESTS
+
+
+// 1) GAME LOGIC
+// - EPOCH struct to hold game times
+// - GameOwnerCap that goes to sender of the init function
+// - Game struct to hold a game instance
+// - Winner event emitted when a winner is claimed
+// - function to create a new game instance
+// - function to start the game and allows predictions to be made
+// - function to close the game/ sets the result and allows the report winner function to be called
+// - function to claim the winner within timeframe by ref, add event to mark the winner
+// - function to set predict epoch
+// - funciton to set report epoch
+
+
+
+// 2) INIT / TRANSFER POLICY LOGIC
+// - OTW for the init function4
+// - Registry struct that will hold the transfer policy
+// - function for the init  that creates the transfer policy and stores it in the regisry which is a shared object
+// - function that adds the royalty rule to the transfer policy
+
+
+
+// 3) PREDICTION LOGIC
+// - PredictionMade event emitted when a prediction is made
+// - Prediction struct
+// - function to make a prediction and lock it in the users kiosk, also emits an event for the prediction
+
+
+
+// 4) KIOSK LOGIC
+// - function that creates a new kiosk for a user that can hold the predictions
+// - function that burns the prediction from the kiosk and deletes the prediction
+// - function that lists the prediction in the kiosk for sale
+// - functioin that delists the prediction from the kiosk
+// - function to purchase a prediction from another user
+// - funciton to withdraw from a personal kiosk
+// - function to withdraw from the transfer policy
+
+
+
+// 5) WITHDRAW FUNCTIONS
+// - function to withdraw from a personal kiosk
+// - function to withdraw from the transfer policy
+// - function to withdraw from game balance
+
+
+
+// 6) Tests
+// - test the init function
+// - test the sender has the game owner cap
+// - test making a prediction
+
+
+
+// ####################################################
+// ###################  FLOW ##########################
+// ####################################################
+
+// when the init function is called, it creates the transfer policy and stores it in the regisry which is a shared object
+// and transfers the transfer policy cap and game owner cap to the sender
+// the game owner cap is then used to start the game and close the game
+// the transfer policy is used to enforce a 5% royalty fee when making a prediction
+// the predictions are held and locked in a users kiosk and they can be listed/ delisted, purchased, and burned.
+// the game owner cap is used to close the game and allow the claim the winner function to be called
+// the winner can then claim the pot and the game instance is deleted
+
+// ####################################################
+// ####################################################
+// ####################################################
+
+
+module predictrix::predictrix {
 
     use sui::kiosk::{Self, Kiosk, KioskOwnerCap};
     use sui::object::{Self, UID, ID};
@@ -24,11 +107,15 @@ module predictrix::predictrix {
     
 
 
-    
-    // errors
+
+    // ########
+    // #ERRORS#
+    // ########
+
     const EOutsideWindow: u64 = 0;
     const EIncorrectPrediction: u64 = 1;
     const EGameNotClosed: u64 = 2;
+    const EWrongPrice: u64 = 3;
 
 
 
@@ -56,6 +143,7 @@ module predictrix::predictrix {
     // struct to hold a game instance
     struct Game has key, store {
         id: UID,
+        price: u64,
         pot: Balance<SUI>, // holds the balance of the game instance, init to zero
         result: Option<u64>,  // will hold the result from the switchboard oracle, initialize to zero / add update function
         predict_epoch: Epoch, // start and end time for predictions
@@ -88,9 +176,10 @@ module predictrix::predictrix {
 
 
     // create a new game instance
-    fun new_game(predict_epoch: Epoch, report_epoch: Epoch, ctx: &mut TxContext) : Game {
+    fun new_game(price: u64, predict_epoch: Epoch, report_epoch: Epoch, ctx: &mut TxContext) : Game {
         Game {
             id: object::new(ctx),
+            price, 
             pot: balance::zero<SUI>(),
             result: option::none(),
             predict_epoch,
@@ -116,7 +205,7 @@ module predictrix::predictrix {
         });
 
 
-        let game = new_game(predict_epoch, report_epoch, ctx);
+        let game = new_game(price, predict_epoch, report_epoch, ctx);
         
         transfer::share_object(game);
         
@@ -124,7 +213,7 @@ module predictrix::predictrix {
 
 
     // REDO
-    // close the game/ sets teh result and allows the report winner function to be called
+    // close the game/ sets the result and allows the report winner function to be called
     public fun close_game(_: &GameOwnerCap, game_instance: &mut Game, aggregator: &Aggregator, ctx: &mut TxContext) : bool {
         
         assert!(game_instance.predict_epoch.end_time < tx_context::epoch(ctx), EOutsideWindow);
@@ -147,11 +236,13 @@ module predictrix::predictrix {
         
         assert!(game_instance.game_closed, EGameNotClosed);
 
-        assert!(clock::timestamp_ms(clock) > game_instance.predict_epoch.start_time, EOutsideWindow);
-        assert!(clock::timestamp_ms(clock) < game_instance.predict_epoch.end_time, EOutsideWindow);
-
+        //checks the timestamp is within the report epoch timeframe
         assert!(clock::timestamp_ms(clock) > game_instance.report_epoch.start_time, EOutsideWindow);
         assert!(clock::timestamp_ms(clock) < game_instance.report_epoch.end_time, EOutsideWindow);
+
+        // checks the prediction is within the predict epoch timeframe
+        assert!(prediction.timestamp > game_instance.predict_epoch.start_time, EOutsideWindow);
+        assert!(prediction.timestamp < game_instance.predict_epoch.end_time, EOutsideWindow);
 
         assert!(prediction.prediction == game_instance.result, EIncorrectPrediction);
 
@@ -184,7 +275,7 @@ module predictrix::predictrix {
             transfer::public_transfer(winning_pot, tx_context::sender(ctx));
         };
         
-        let Game { id, pot, result: _, predict_epoch, report_epoch, game_closed: _, winner_claimed} = game_instance;
+        let Game { id, price: _, pot, result: _, predict_epoch, report_epoch, game_closed: _, winner_claimed} = game_instance;
         object::delete(id);
 
 
@@ -232,59 +323,6 @@ module predictrix::predictrix {
     
 
 
-    // ########################################
-    // ############PREDICTION LOGIC############
-    // ########################################
-
-    // event emitted when a prediction is made
-    // user only needs to predict the repub and dem can be caluculated from the total count
-    struct PredictionMade has copy, drop {
-        prediction: Option<u64>,
-        made_by: address,
-    }
-
-
-
-    // the prediction struct
-    struct Prediction has key, store {
-        id: UID,
-        prediction_id: ID,
-        prediction: Option<u64>,
-        timestamp: u64,
-        
-    }
-
-
-
-    // makes a prediction and locks it in the users kiosk and emits an event for the prediction
-    public fun make_prediction(kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, predict: u64, clock: &Clock, _tp: &TransferPolicy<Prediction>, ctx: &mut TxContext)  {
-        
-        
-        event::emit(PredictionMade {
-            prediction: option::some(predict),
-            made_by: tx_context::sender(ctx),
-        });
-
-        let id = object::new(ctx);
-        let prediction_id = object::uid_to_inner(&id);
-
-        let prediction = Prediction {
-            id, 
-            prediction_id,
-            prediction: option::some(predict),
-            timestamp: clock::timestamp_ms(clock),
-        };
-
-
-        // place and lock item into the kiosk
-        kiosk::lock(kiosk, kiosk_owner_cap, _tp, prediction);
-       
-
-        
-    }
-
-
-
 
 
     // #####################################################
@@ -325,6 +363,7 @@ module predictrix::predictrix {
             tp: transfer_policy,
         };
 
+
         // transfer the publisher, transfer policy cap and game owner cap to the sender and share the registry
         transfer::public_transfer(publisher, tx_context::sender(ctx));
         transfer::public_transfer(tp_cap, tx_context::sender(ctx));
@@ -351,9 +390,64 @@ module predictrix::predictrix {
 
 
 
+
+    // ########################################
+    // ############PREDICTION LOGIC############
+    // ########################################
+
+    // event emitted when a prediction is made
+    // user only needs to predict the repub and dem can be caluculated from the total count
+    struct PredictionMade has copy, drop {
+        prediction: Option<u64>,
+        made_by: address,
+    }
+
+
+
+    // the prediction struct
+    struct Prediction has key, store {
+        id: UID,
+        prediction_id: ID,
+        prediction: Option<u64>,
+        timestamp: u64,
+        
+    }
+
+
+
+    // makes a prediction and locks it in the users kiosk and emits an event for the prediction
+    // ADD COST THAT GOES TO BALANCE
+    public fun make_prediction(game: &mut Game, cost: Coin<SUI>, kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, predict: u64, clock: &Clock, _tp: &TransferPolicy<Prediction>, ctx: &mut TxContext)  {
+        
+        assert!(coin::value(&cost) < game.price, EWrongPrice);
+        balance::join(&mut game.pot, coin::into_balance(cost));
+        
+        event::emit(PredictionMade {
+            prediction: option::some(predict),
+            made_by: tx_context::sender(ctx),
+        });
+
+        let id = object::new(ctx);
+        let prediction_id = object::uid_to_inner(&id);
+
+        let prediction = Prediction {
+            id, 
+            prediction_id,
+            prediction: option::some(predict),
+            timestamp: clock::timestamp_ms(clock),
+        };
+
+
+        // place and lock item into the kiosk
+        kiosk::lock(kiosk, kiosk_owner_cap, _tp, prediction);
+       
+
+        
+    }
+
+
+
     
-
-
     // ###################################
     // ############KIOSK LOGIC############
     // ###################################
@@ -418,7 +512,9 @@ module predictrix::predictrix {
 
 
     
-
+    // ###################
+    // WITHDRAW FUNCTIONS
+    // ###################
 
     // withdraw from a personal kiosk
     public fun withdraw_balance_from_kiosk(kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, amount: Option<u64>, ctx: &mut TxContext) : Coin<SUI> {
@@ -432,6 +528,12 @@ module predictrix::predictrix {
         tp::withdraw(transfer_policy, transfer_policy_cap, amount, ctx)
     }
 
+
+
+    // withdraw from game balance
+    fun withdraw_balance_from_game(_: &GameOwnerCap, game: &mut Game, amount: Option<u64>, ctx: &mut TxContext) : Balance<SUI> {
+        balance::withdraw_all<SUI>(&mut game.pot)
+    }
 
 
 
@@ -547,11 +649,10 @@ module predictrix::predictrix {
 // ###################################
 
 // only need one value as a + b = 538
-// add transfer policy rules and create the empty_policy function
-// add consts, asserts, and tests
-// add switchboard oracle prototype
-// ptb for making predictions
-// add display for teh prediction
+// tests
+// add variable to pull data from the switchboard prototype
+// ptb for making predictions/ connect to front end
+// add display for the prediction
 
 
 
