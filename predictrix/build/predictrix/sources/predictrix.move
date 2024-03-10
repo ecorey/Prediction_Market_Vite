@@ -11,6 +11,7 @@
 // 6. TESTS
 
 
+
 // 1) GAME LOGIC
 // - EPOCH struct to hold game times
 // - GameOwnerCap that goes to sender of the init function
@@ -649,6 +650,7 @@ module predictrix::predictrix {
 // ###################################
 
 // only need one value as a + b = 538
+// claim button on the frontend
 // tests
 // add variable to pull data from the switchboard prototype
 // ptb for making predictions/ connect to front end
