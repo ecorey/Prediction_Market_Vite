@@ -70,13 +70,11 @@
 // ###################  FLOW ##########################
 // ####################################################
 
-// when the init function is called, it creates the transfer policy and stores it in the regisry which is a shared object
-// and transfers the transfer policy cap and game owner cap to the sender
-// the game owner cap is then used to start the game and close the game
-// the transfer policy is used to enforce a 5% royalty fee when making a prediction
-// the predictions are held and locked in a users kiosk and they can be listed/ delisted, purchased, and burned.
-// the game owner cap is used to close the game and allow the claim the winner function to be called
-// the winner can then claim the pot and the game instance is deleted
+// When the init function is called, it creates the transfer policy and stores it in the regisry which is a shared object. The init also transfers the transfer policy cap and game owner cap to the sender and the game owner cap can then be used to start the game and close the game.
+// The transfer policy is used to enforce a 5% royalty fee when making a prediction.
+// The predictions are held and locked in a users kiosk and they can be listed/ delisted, purchased, and burned.
+// The game owner cap is used to start/ close the game.
+// After teh game is closed the winner can call the claim function and  claim the pot. The game instance is then deleted.
 
 // ####################################################
 // ####################################################
