@@ -73,8 +73,7 @@
 // When the init function is called, it creates the transfer policy and stores it in the regisry which is a shared object. The init also transfers the transfer policy cap and game owner cap to the sender and the game owner cap can then be used to start the game and close the game.
 // The transfer policy is used to enforce a 5% royalty fee when making a prediction.
 // The predictions are held and locked in a users kiosk and they can be listed/ delisted, purchased, and burned.
-// The game owner cap is used to start/ close the game.
-// After teh game is closed the winner can call the claim function and  claim the pot. The game instance is then deleted.
+// After the game is closed the winner can call the claim function and  claim the pot. The game instance is then deleted.
 
 // ####################################################
 // ####################################################
