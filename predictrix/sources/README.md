@@ -13,7 +13,7 @@ The structure of the program is as follows:
 
 
 1) GAME LOGIC
-    - EPOCH struct to hold game times
+    - Epoch struct to hold game times
     - GameOwnerCap that goes to sender of the init function
     - Game struct to hold a game instance
     - Winner event emitted when a winner is claimed
