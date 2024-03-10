@@ -73,7 +73,7 @@ The structure of the program is as follows:
   FLOW 
 
 
-When the init function is called, it creates the transfer policy and stores it in the regisry which is a shared object. The init also transfers the transfer policy cap and game owner cap to the sender and the game owner cap can then be used to start the game and close the game.
+When the init function is called, it creates the transfer policy and stores it in the registry which is a shared object. The init also transfers the transfer policy cap and game owner cap to the sender. The game owner cap can then be used to start the game and close the game.
 The transfer policy is used to enforce a 5% royalty fee when making a prediction.
 The predictions are held and locked in a users kiosk and they can be listed/ delisted, purchased, and burned.
 After the game is closed the winner can call the claim function and claim the pot. The game instance is then deleted.
