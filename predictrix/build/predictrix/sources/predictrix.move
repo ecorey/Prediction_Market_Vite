@@ -11,7 +11,6 @@
 // 6. TESTS
 
 
-
 // 1) GAME LOGIC
 // - EPOCH struct to hold game times
 // - GameOwnerCap that goes to sender of the init function
@@ -83,6 +82,11 @@
 // ####################################################
 
 
+
+/// USE EPOCH AS TIMESTAMP?
+//  epoch 311 started Mar 16, 11:20 AM
+
+
 module predictrix::predictrix {
 
     use sui::kiosk::{Self, Kiosk, KioskOwnerCap};
@@ -100,6 +104,7 @@ module predictrix::predictrix {
     use sui::table::Table;
     use sui::coin::{Self, Coin};    
     use sui::clock::{Self, Clock};
+    use sui::borrow::{Self, Borrow};
 
     use predictrix::royalty_policy;
 
@@ -136,21 +141,34 @@ module predictrix::predictrix {
 
 
     // game owner cap that goes to sender of the init function
-    struct GameOwnerCap has key {
+     struct GameOwnerCap has key {
         id: UID,
     }
+
+    
+    
+    struct StartGameCap has key {
+        id: UID,
+    }
+
+
+
+    struct EndGameCap has key {
+        id: UID,
+    }
+
 
 
     // struct to hold a game instance
     struct Game has key, store {
         id: UID,
         price: u64,
-        pot: Balance<SUI>, // holds the balance of the game instance, init to zero
-        result: Option<u64>,  // will hold the result from the switchboard oracle, initialize to zero / add update function
-        predict_epoch: Epoch, // start and end time for predictions
-        report_epoch: Epoch, // start and end time for reporting the winner
-        game_closed: bool, // bool to check if the game is closed
-        winner_claimed: bool, // bool to check if the winner has claimed the pot
+        pot: Balance<SUI>, 
+        result: Option<u64>,  
+        predict_epoch: Epoch, 
+        report_epoch: Epoch, 
+        game_closed: bool, 
+        winner_claimed: bool, 
         
     }
 
@@ -168,10 +186,25 @@ module predictrix::predictrix {
 
 
     // event emitted when a winner is reported  
-    struct Winner has copy, drop {
-        prediction: Option<u64>,
-        made_by: address,
-        time: u64,
+    // struct Winner has copy, drop {
+    //     prediction: Option<u64>,
+    //     made_by: address,
+    //     time: u64,
+    // 
+
+
+    // GET TIME
+
+    struct TimeEvent has copy, drop, store {
+        timestamp_ms: u64
+    }
+
+    
+    public fun get_time(clock: &Clock)  {
+        event::emit(TimeEvent {
+            timestamp_ms: clock::timestamp_ms(clock),
+        });
+
     }
 
 
@@ -191,9 +224,10 @@ module predictrix::predictrix {
     }
 
 
+  
 
     // startst the game and allows predictions to be made
-    public fun start_game(_: &GameOwnerCap, coin: String, price: u64, predict_epoch: Epoch, report_epoch: Epoch, clock: &Clock, ctx: &mut TxContext)  {
+    public fun start_game(start_game_cap: StartGameCap, price: u64, predict_epoch: Epoch, report_epoch: Epoch, clock: &Clock, ctx: &mut TxContext)  {
 
        
 
@@ -209,21 +243,27 @@ module predictrix::predictrix {
         let game = new_game(price, predict_epoch, report_epoch, ctx);
         
         transfer::share_object(game);
+
+        let StartGameCap { id } = start_game_cap;
+        object::delete(id);
         
     }
 
 
     // REDO
     // close the game/ sets the result and allows the report winner function to be called
-    public fun close_game(_: &GameOwnerCap, game_instance: &mut Game, aggregator: &Aggregator, ctx: &mut TxContext) : bool {
+    public fun close_game(end_game_cap: EndGameCap, game_instance: &mut Game, result: u64, ctx: &mut TxContext) : bool {
         
-        assert!(game_instance.predict_epoch.end_time < tx_context::epoch(ctx), EOutsideWindow);
+        // assert!(game_instance.predict_epoch.end_time < tx_context::epoch(ctx), EOutsideWindow);
         game_instance.game_closed = true;
         
-        switchboard_oracle::save_aggregator_info(aggregator, ctx);
+        // switchboard_oracle::save_aggregator_info(aggregator, ctx);
+
+        let EndGameCap { id } = end_game_cap;
+        object::delete(id);
 
         // ORACLE logic to save the data to the game instance' result field
-        // game_instance.result = option::some(result.latest_result);
+        game_instance.result = option::some(result);
 
         game_instance.game_closed
         
@@ -233,70 +273,73 @@ module predictrix::predictrix {
 
 
     // claim the winner within timeframe by ref, add event to mark the winner
-    public fun claim_winner(prediction: &Prediction, game_instance: Game, clock: &Clock, ctx: &mut TxContext ) : (bool, address, Balance<SUI>, bool) {
+    // public fun claim_winner(prediction: Prediction, game_instance: Game, clock: &Clock, ctx: &mut TxContext ) : (bool, address, Balance<SUI>, bool) {
         
-        assert!(game_instance.game_closed, EGameNotClosed);
+    //     assert!(game_instance.game_closed, EGameNotClosed);
 
-        //checks the timestamp is within the report epoch timeframe
-        assert!(clock::timestamp_ms(clock) > game_instance.report_epoch.start_time, EOutsideWindow);
-        assert!(clock::timestamp_ms(clock) < game_instance.report_epoch.end_time, EOutsideWindow);
+    //     //checks the timestamp is within the report epoch timeframe
+    //     assert!(clock::timestamp_ms(clock) > game_instance.report_epoch.start_time, EOutsideWindow);
+    //     assert!(clock::timestamp_ms(clock) < game_instance.report_epoch.end_time, EOutsideWindow);
 
-        // checks the prediction is within the predict epoch timeframe
-        assert!(prediction.timestamp > game_instance.predict_epoch.start_time, EOutsideWindow);
-        assert!(prediction.timestamp < game_instance.predict_epoch.end_time, EOutsideWindow);
+    //     // checks the prediction is within the predict epoch timeframe
+    //     assert!(prediction.timestamp > game_instance.predict_epoch.start_time, EOutsideWindow);
+    //     assert!(prediction.timestamp < game_instance.predict_epoch.end_time, EOutsideWindow);
 
-        assert!(prediction.prediction == game_instance.result, EIncorrectPrediction);
+    //     assert!(prediction.prediction == game_instance.result, EIncorrectPrediction);
 
-        let bool_val = true;
+    //     let bool_val = true;
 
-        if(prediction.prediction == game_instance.result) {
-            event::emit(Winner {
-                prediction: prediction.prediction,
-                made_by: tx_context::sender(ctx),
-                time: clock::timestamp_ms(clock),
-            });
-        };
+    //     if(prediction.prediction == game_instance.result) {
+    //         event::emit(Winner {
+    //             prediction: prediction.prediction,
+    //             made_by: tx_context::sender(ctx),
+    //             time: clock::timestamp_ms(clock),
+    //         });
+    //     };
 
 
-        if(prediction.prediction == game_instance.result) {
-            let bool_val = true;
-        } else {
-            let bool_val = false;
-        };
+    //     if(prediction.prediction == game_instance.result) {
+    //         let bool_val = true;
+    //     } else {
+    //         let bool_val = false;
+    //     };
 
         
-        if(prediction.prediction == game_instance.result) {
+    //     if(prediction.prediction == game_instance.result) {
 
-            game_instance.winner_claimed = true;
+    //         game_instance.winner_claimed = true;
            
-            let bal_all = balance::withdraw_all(&mut game_instance.pot);
+    //         let bal_all = balance::withdraw_all(&mut game_instance.pot);
 
-            let winning_pot = coin::from_balance(bal_all, ctx);
+    //         let winning_pot = coin::from_balance(bal_all, ctx);
 
-            transfer::public_transfer(winning_pot, tx_context::sender(ctx));
-        };
+    //         transfer::public_transfer(winning_pot, tx_context::sender(ctx));
+    //     };
         
-        let Game { id, price: _, pot, result: _, predict_epoch, report_epoch, game_closed: _, winner_claimed} = game_instance;
-        object::delete(id);
+    //     let Game { id, price: _, pot, result: _, predict_epoch, report_epoch, game_closed: _, winner_claimed} = game_instance;
+    //     object::delete(id);
 
 
-        let Epoch { id, start_time: _, end_time: _} = predict_epoch;
-        object::delete(id);
+    //     let Epoch { id, start_time: _, end_time: _} = predict_epoch;
+    //     object::delete(id);
 
 
-        let Epoch { id, start_time: _, end_time: _} = report_epoch;
-        object::delete(id);
+    //     let Epoch { id, start_time: _, end_time: _} = report_epoch;
+    //     object::delete(id);
+
+    //     let Prediction {id, prediction_id: _, prediction: _, } = prediction;
+    //     object::delete(id);
 
 
 
-        (bool_val, tx_context::sender(ctx), pot, winner_claimed)
+    //     (bool_val, tx_context::sender(ctx), pot, winner_claimed)
 
 
-    } 
+    // } 
     
 
 
-    fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) : Epoch {
+    public fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) : Epoch  {
         
         let predict_epoch  = Epoch {
             id: object::new(ctx),
@@ -310,7 +353,8 @@ module predictrix::predictrix {
 
 
 
-    fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) : Epoch {
+
+    public fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) : Epoch {
         
         let report_epoch  = Epoch {
             id: object::new(ctx),
@@ -325,6 +369,18 @@ module predictrix::predictrix {
 
 
 
+    // deletes the epoch
+    public fun delete_epoch(epoch: Epoch, ctx: &mut TxContext) {
+        let Epoch { id, start_time: _, end_time: _ } = epoch;
+        object::delete(id);
+    }
+
+
+
+
+
+
+
 
     // #####################################################
     // ############INIT  / TRANSFER POLICY LOGIC############
@@ -334,13 +390,10 @@ module predictrix::predictrix {
     struct PREDICTRIX has drop {}
     
 
-
-    // registry that will hold the transfer policy
-    struct Registry has key, store {
-        id: UID, 
-        tp: TransferPolicy<Prediction>,
+    // event that is emitted when the init function is called and gives the time
+    struct InitEvent has copy, drop {
+        tx_epoch: u64,
     }
-    
 
 
     // init creates the transfer policy and stores it in the regisry which is a shared object 
@@ -358,22 +411,33 @@ module predictrix::predictrix {
         // add royality rule to the transfer policy with a 5% royality fee
         add_royalty_to_policy(&mut transfer_policy, &tp_cap, 005_00);
 
-        // adds tranfer policy to the registry
-        let registry = Registry {
-            id: object::new(ctx),
-            tp: transfer_policy,
-        };
-
 
         // transfer the publisher, transfer policy cap and game owner cap to the sender and share the registry
         transfer::public_transfer(publisher, tx_context::sender(ctx));
         transfer::public_transfer(tp_cap, tx_context::sender(ctx));
-        transfer::public_share_object(registry);
+        transfer::public_share_object(transfer_policy);
         
 
         transfer::transfer(GameOwnerCap {
             id: object::new(ctx),
         }, tx_context::sender(ctx));
+
+
+        transfer::transfer(StartGameCap {
+            id: object::new(ctx),
+        }, tx_context::sender(ctx));
+
+
+        transfer::transfer(EndGameCap {
+            id: object::new(ctx),
+        }, tx_context::sender(ctx));
+
+
+
+        event::emit(InitEvent {
+            tx_epoch: tx_context::epoch(ctx),
+        });
+
 
     }
 
@@ -388,6 +452,8 @@ module predictrix::predictrix {
         
         royalty_policy::set<Prediction>(policy, cap, amount_bp);
     }
+
+
 
 
 
@@ -414,19 +480,17 @@ module predictrix::predictrix {
         
     }
 
+   
 
 
-    // makes a prediction and locks it in the users kiosk and emits an event for the prediction
-    // ADD COST THAT GOES TO BALANCE
-    public fun make_prediction(game: &mut Game, cost: Coin<SUI>, kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, predict: u64, clock: &Clock, _tp: &TransferPolicy<Prediction>, ctx: &mut TxContext)  {
+   public fun make_prediction( predict: u64, clock: &Clock, ctx: &mut TxContext) : Prediction {
         
-        assert!(coin::value(&cost) < game.price, EWrongPrice);
-        balance::join(&mut game.pot, coin::into_balance(cost));
-        
+      
         event::emit(PredictionMade {
             prediction: option::some(predict),
             made_by: tx_context::sender(ctx),
         });
+
 
         let id = object::new(ctx);
         let prediction_id = object::uid_to_inner(&id);
@@ -439,12 +503,25 @@ module predictrix::predictrix {
         };
 
 
-        // place and lock item into the kiosk
-        kiosk::lock(kiosk, kiosk_owner_cap, _tp, prediction);
+        prediction
        
-
-        
     }
+
+
+
+
+    // deletes the prediction
+    public fun delete_prediction(prediction: Prediction, ctx: &mut TxContext) {
+
+        let Prediction { id, prediction_id: _, prediction: _, timestamp: _ } = prediction;
+        object::delete(id);
+
+    }
+
+
+
+
+    
 
 
 
@@ -453,68 +530,49 @@ module predictrix::predictrix {
     // ############KIOSK LOGIC############
     // ###################################
 
-    // creates a new kiosk for a user that can hold the predictions 
-    // and returns the kiosk and the kiosk owner cap
-    public fun create_kiosk(ctx: &mut TxContext) : (Kiosk, KioskOwnerCap) {
-        let (kiosk, kiosk_owner_cap) = kiosk::new(ctx);
-        (kiosk, kiosk_owner_cap)
+
+
+
+    // done in ptb
+    // place, take, list, delist, purchase 
+    
+
+
+   
+    
+    // ###################################
+    // ############GETTER/ SETTER LOGIC###
+    // ###################################
+
+    struct GameBalance has copy, drop {
+        balance: u64,
     }
 
-
-
-    // burns the prediction from the kiosk and deletes the prediction
-    public fun burn_from_kiosk( kiosk: &mut Kiosk, kiosk_cap: &KioskOwnerCap, prediction_id: ID, registry: &mut Registry, ctx: &mut TxContext) {
-
-        let purchase_cap = kiosk::list_with_purchase_cap<Prediction>( kiosk, kiosk_cap, prediction_id, 0, ctx); 
-        let ( prediction, transfer_request)  = kiosk::purchase_with_cap<Prediction>(kiosk, purchase_cap, coin::zero<SUI>(ctx));
-        tp::confirm_request<Prediction>( &registry.tp, transfer_request  );
-
-        let Prediction {id, prediction_id: _, prediction: _, timestamp: _} = prediction;
-        object::delete(id);
-
-    }
-
-
-
-    // lists the prediction in the kiosk for sale
-    public fun list_prediction<T: key + store>(
-        kiosk: &mut Kiosk, 
-        kiosk_cap: &KioskOwnerCap, 
-        prediction_id: ID, 
-        price: u64
-    ) {
-        kiosk::list<Prediction>(kiosk, kiosk_cap, prediction_id, price);
-    }
-
-
-
-    // delists the prediction from the kiosk
-    public fun delist_prediction<T: key + store>(
-        kiosk: &mut Kiosk,
-        kiosk_cap: &KioskOwnerCap,
-        prediction_id: ID,
-    ) {
-        kiosk::delist<Prediction>(kiosk, kiosk_cap, prediction_id);
-    }
-
-
-
-    // purchase a prediction from another user
-    public fun purchase_prediction<T: key + store>(
-        kiosk: &mut Kiosk,
-        prediction_id: ID,
-        payment: Coin<SUI>
+    // gets the game balance
+    public fun get_game_balance(game: &Game) : u64 {
         
-    ) : (Prediction, TransferRequest<Prediction>) {
+        let bal = balance::value<SUI>(&game.pot);
 
-        kiosk::purchase<Prediction>(kiosk, prediction_id, payment)
+        event::emit(GameBalance {
+            balance: bal,
+        });
+
+        bal
+    }
+
+
+
+    // puts a coin into the game balance
+    public fun add_game_balance(game: &mut Game, deposit: Coin<SUI>, ctx: &mut TxContext) {
+        let pot = &mut game.pot;
+        balance::join(pot, coin::into_balance(deposit));
     }
 
 
 
     
     // ###################
-    // WITHDRAW FUNCTIONS
+    // WITHDRAW FUNCTIONS#
     // ###################
 
     // withdraw from a personal kiosk
@@ -532,14 +590,27 @@ module predictrix::predictrix {
 
 
     // withdraw from game balance
-    fun withdraw_balance_from_game(_: &GameOwnerCap, game: &mut Game, amount: Option<u64>, ctx: &mut TxContext) : Balance<SUI> {
-        balance::withdraw_all<SUI>(&mut game.pot)
+    public fun withdraw_balance_from_game(_: &GameOwnerCap, game: &mut Game, amount: u64, ctx: &mut TxContext): Coin<SUI> {
+        let withdrawal = balance::split(&mut game.pot, amount);
+        coin::from_balance(withdrawal, ctx)
     }
 
 
 
 
 
+    // ###################
+    // CLEANUP FUNCTIONS##
+    // ###################
+
+
+    public fun delete_game_owner_cap(game_owner_cap: GameOwnerCap, ctx: &mut TxContext) {
+        let GameOwnerCap { id } = game_owner_cap;
+        object::delete(id);
+    }
+
+
+   
 
     // ###################################
     // ############TESTS##################
@@ -606,10 +677,7 @@ module predictrix::predictrix {
             
 
             // MAKE PREDICTION AND BURN PREDICTION
-            // make_prediction(&mut kiosk, &kiosk_owner_cap, guess, &clock, &transfer_policy, test_scenario::ctx(scenario_val));
-            // burn_from_kiosk( kiosk, kiosk_owner_cap, prediction_id, registry, test_scenario::ctx(scenario_val));
-
-
+            
 
 
 
@@ -650,7 +718,6 @@ module predictrix::predictrix {
 // ###################################
 
 // only need one value as a + b = 538
-// claim button on the frontend
 // tests
 // add variable to pull data from the switchboard prototype
 // ptb for making predictions/ connect to front end
