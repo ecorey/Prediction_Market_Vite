@@ -5,11 +5,11 @@ import walletDev from './dev-wallet.json' assert { type: 'json' };
 
 import { WebSocket } from 'ws';
 
-import {  PACKAGE, GAME_OWNER_CAP } from './config.js';
+import {  PACKAGE, CLOCK  } from './config.js';
 
 
 // ###################################
-// ############DELETE OWNER CAP#######
+// ############MAKE PREDICTION########
 // ###################################
 
 
@@ -44,15 +44,12 @@ const client = new SuiClient({
 
 
 
-        
-
         txb.moveCall({
-            target: `${PACKAGE}::kiosk_practice::delete_game_owner_cap`,
-            arguments: [ txb.object(GAME_OWNER_CAP)],
+            target: `${PACKAGE}::kiosk_practice::make_prediction`,
+            arguments: [  txb.pure.u64(223), txb.object(CLOCK) ],
         });
 
-
-
+        
 
 
         
@@ -64,7 +61,7 @@ const client = new SuiClient({
         
 
 
-        // log the transaction result
+        // // log the transaction result
         console.log(`Transaction result: ${JSON.stringify(txid, null, 2)}`);
         console.log(`success: https://suiexplorer.com/txblock/${txid.digest}?network=testnet`);
 
