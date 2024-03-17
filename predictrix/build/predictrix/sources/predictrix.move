@@ -83,8 +83,7 @@
 
 
 
-/// USE EPOCH AS TIMESTAMP?
-//  epoch 311 started Mar 16, 11:20 AM
+
 
 
 module predictrix::predictrix {
@@ -226,7 +225,7 @@ module predictrix::predictrix {
 
   
 
-    // startst the game and allows predictions to be made
+    // starts the game and allows predictions to be made
     public fun start_game(start_game_cap: StartGameCap, price: u64, predict_epoch: Epoch, report_epoch: Epoch, clock: &Clock, ctx: &mut TxContext)  {
 
        
@@ -369,11 +368,7 @@ module predictrix::predictrix {
 
 
 
-    // deletes the epoch
-    public fun delete_epoch(epoch: Epoch, ctx: &mut TxContext) {
-        let Epoch { id, start_time: _, end_time: _ } = epoch;
-        object::delete(id);
-    }
+    
 
 
 
@@ -510,13 +505,7 @@ module predictrix::predictrix {
 
 
 
-    // deletes the prediction
-    public fun delete_prediction(prediction: Prediction, ctx: &mut TxContext) {
-
-        let Prediction { id, prediction_id: _, prediction: _, timestamp: _ } = prediction;
-        object::delete(id);
-
-    }
+   
 
 
 
@@ -548,6 +537,7 @@ module predictrix::predictrix {
         balance: u64,
     }
 
+
     // gets the game balance
     public fun get_game_balance(game: &Game) : u64 {
         
@@ -570,29 +560,37 @@ module predictrix::predictrix {
 
 
 
+
     
     // ###################
     // WITHDRAW FUNCTIONS#
     // ###################
 
-    // withdraw from a personal kiosk
+    // withdraw from a personal kiosk [untested]
     public fun withdraw_balance_from_kiosk(kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, amount: Option<u64>, ctx: &mut TxContext) : Coin<SUI> {
         kiosk::withdraw(kiosk, kiosk_owner_cap, amount, ctx)
     }
 
 
 
-    // withdraw from the transfer policy
+    // withdraw from the transfer policy [untested]
     public fun withdraw_balance_from_tranfer_policy( transfer_policy: &mut TransferPolicy<Prediction>, transfer_policy_cap: &TransferPolicyCap<Prediction>, amount: Option<u64>, ctx: &mut TxContext ) : Coin<SUI> {
         tp::withdraw(transfer_policy, transfer_policy_cap, amount, ctx)
     }
 
 
 
+
     // withdraw from game balance
-    public fun withdraw_balance_from_game(_: &GameOwnerCap, game: &mut Game, amount: u64, ctx: &mut TxContext): Coin<SUI> {
+    public fun withdraw_balance_from_game(_: &GameOwnerCap, game: &mut Game, amount: u64, ctx: &mut TxContext) {
+       
+        assert!(game.game_closed, EGameNotClosed);  
+        
         let withdrawal = balance::split(&mut game.pot, amount);
-        coin::from_balance(withdrawal, ctx)
+    
+        let bal = coin::from_balance(withdrawal, ctx);
+
+        transfer::public_transfer(bal, tx_context::sender(ctx));
     }
 
 
@@ -604,10 +602,31 @@ module predictrix::predictrix {
     // ###################
 
 
+    // deletes the epoch
+    public fun delete_epoch(epoch: Epoch, ctx: &mut TxContext) {
+        let Epoch { id, start_time: _, end_time: _ } = epoch;
+        object::delete(id);
+    }
+
+
+
     public fun delete_game_owner_cap(game_owner_cap: GameOwnerCap, ctx: &mut TxContext) {
         let GameOwnerCap { id } = game_owner_cap;
         object::delete(id);
     }
+
+
+
+    // deletes the prediction
+    public fun delete_prediction(prediction: Prediction, ctx: &mut TxContext) {
+
+        let Prediction { id, prediction_id: _, prediction: _, timestamp: _ } = prediction;
+        object::delete(id);
+
+    }
+
+
+
 
 
    
@@ -712,16 +731,6 @@ module predictrix::predictrix {
 }
 
 
-
-// ###################################
-// ############TODO###################
-// ###################################
-
-// only need one value as a + b = 538
-// tests
-// add variable to pull data from the switchboard prototype
-// ptb for making predictions/ connect to front end
-// add display for the prediction
 
 
 
