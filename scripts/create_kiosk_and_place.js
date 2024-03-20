@@ -4,15 +4,12 @@ import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { WebSocket } from 'ws';
 import wallet from './dev-wallet.json' assert { type: 'json' };
 import { KioskClient, Network, KioskTransaction } from '@mysten/kiosk';
-import {  PREDICTION, ITEMTYPE } from './config.js';
+import {  PREDICTION_TWO, ITEMTYPE } from './config.js';
 
 // generate a keypair
 const privateKeyArray = wallet.privateKey.split(',').map(num => parseInt(num, 10));
 const privateKeyBytes = new Uint8Array(privateKeyArray);
 const keypair = Ed25519Keypair.fromSecretKey(privateKeyBytes);
-
-
-
 
 
 // client
@@ -33,15 +30,6 @@ const kioskClient = new KioskClient({
 
 
 
-const getCap = async () => {
-    let { kioskOwnerCaps } = await kioskClient.getOwnedKiosks(keypair.getPublicKey().toRawBytes());
-   
-    return kioskOwnerCaps[0];
-}
-
-
-
-
 (async () => {
     try {
      
@@ -50,45 +38,30 @@ const getCap = async () => {
         const txb = new TransactionBlock();
         
 
-
         // create Kiosk TxBlock
-        const kioskTx = new KioskTransaction({ kioskClient, transactionBlock: txb, cap: await getCap() });
+        const kioskTx = new KioskTransaction({ transactionBlock: txb, kioskClient });
 
 
-
-        // create a new kiosk
+        // create a new kiosk public shared kiosk
         kioskTx.create();
 
-        
 
-    
-        // place a prediction in the kiosk (works)
-        const prediction_id = kioskTx.place({
-            item: txb.object(PREDICTION),
-            itemType: ITEMTYPE,
+        kioskTx
+        .place({
+            itemType: `${ITEMTYPE}`,
+            item: `${PREDICTION_TWO}`,
         });
 
+
+        kioskTx.shareAndTransferCap(`${keypair.getPublicKey().toSuiAddress()}`);
+
+        kioskTx.finalize();
+
         
 
-
-        console.log(`Prediction ID: ${prediction_id} placed in kiosk`);
+        console.log(`Prediction placed in kiosk`);
 
     
-
-
-        
-
-
-
-        kioskTx.shareAndTransferCap(keypair.getPublicKey().toRawBytes());
-
-        // finalize the kiosk transaction
-        kioskTx.finalize();
-        
-        
-
-
-
         
         // finalize the transaction block
         let txid = await client.signAndExecuteTransactionBlock({

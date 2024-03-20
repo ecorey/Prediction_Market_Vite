@@ -1,10 +1,12 @@
-import { getFullnodeUrl, SuiClient, SuiHTTPTransport } from "@mysten/sui.js/client";
+// imports
+import { getFullnodeUrl, SuiClient, SuiHTTPTransport  } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { WebSocket } from 'ws';
 import wallet from './dev-wallet.json' assert { type: 'json' };
 import { KioskClient, Network, KioskTransaction } from '@mysten/kiosk';
-import {  PREDICTION_TWO, ITEMTYPE } from './config.js';
+import { WebSocket } from 'ws';
+
+
 
 // generate a keypair
 const privateKeyArray = wallet.privateKey.split(',').map(num => parseInt(num, 10));
@@ -12,6 +14,12 @@ const privateKeyBytes = new Uint8Array(privateKeyArray);
 const keypair = Ed25519Keypair.fromSecretKey(privateKeyBytes);
 
 
+console.log(`Public Key raw bytes: ${keypair.getPublicKey().toRawBytes()}`);
+
+console.log(`Public Key: ${keypair.getPublicKey().toSuiAddress()}`);
+
+
+const itemType = '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::Prediction';
 
 
 // client
@@ -23,16 +31,21 @@ const client = new SuiClient({
 });
 
 
-
 // kiosk client
 const kioskClient = new KioskClient({
     client, 
     network: Network.TESTNET,
 });
 
-const { kioskOwnerCaps } = await kioskClient.getOwnedKiosks({ address: keypair.getPublicKey().toSuiAddress()});
 
 
+const getCap = async () => {
+    let { kioskOwnerCaps } = await kioskClient.getOwnedKiosks(keypair.getPublicKey().toRawBytes());
+    // Assume that the user has only 1 kiosk.
+    // Here, you need to do some more checks in a realistic scenario.
+    // And possibly give the user in our dApp a kiosk selector to choose which one they want to interact with (if they own more than one).
+    return kioskOwnerCaps[0];
+}
 
 
 
@@ -47,33 +60,58 @@ const { kioskOwnerCaps } = await kioskClient.getOwnedKiosks({ address: keypair.g
 
 
         // create Kiosk TxBlock
-        const kioskTx = new KioskTransaction({ kioskClient, transactionBlock: txb,  cap: kioskOwnerCaps[0] });
+        const kioskTx = new KioskTransaction({ kioskClient, transactionBlock: txb, cap: await getCap() });
 
 
 
-        txb.setGasBudget(10000000);
+        // create a new kiosk
+        kioskTx.create();
+
+        
+
+
+        
+
+       
+
+
+
+
+
         
     
-        kioskTx.list({
-            itemType: `${ITEMTYPE}`,
-            itemId: `${PREDICTION_TWO}`,
-            price: 10000000
+        // place a prediction in the kiosk (works)
+        const prediction_id = kioskTx.place({
+            item: txb.object(prediction),
+            itemType: itemType,
         });
 
-        
 
-        
-        console.log(`prediction listed in kiosk`);
-        
+
+
+    
+
+
+        // take the prediction from the kiosk
+        kioskTx.take({
+            itemType: prediction,
+            itemId: prediction_id,
+        });
+
+
+
+
 
         kioskTx.shareAndTransferCap(keypair.getPublicKey().toRawBytes());
-
 
         // finalize the kiosk transaction
         kioskTx.finalize();
         
         
 
+
+
+        
         // finalize the transaction block
         let txid = await client.signAndExecuteTransactionBlock({
             signer: keypair,
