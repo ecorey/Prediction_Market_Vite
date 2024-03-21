@@ -1,13 +1,10 @@
-// Import necessary libraries and components
 import React, { useState } from 'react';
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import cn from 'classnames';
-import { WebSocket } from 'ws';
 import { useWallet } from '@suiet/wallet-kit';
-import { getFullnodeUrl, SuiClient, SuiHTTPTransport  } from "@mysten/sui.js/client";
 import { TransactionBlock } from '@mysten/sui.js/transactions';
 import {  PACKAGE, CLOCK  } from '../../scripts/config.ts';
 
@@ -17,8 +14,8 @@ import {  PACKAGE, CLOCK  } from '../../scripts/config.ts';
 
 
 const MakePrediction = () => {
-  const { connected } = useWallet();
-
+  
+  const { connected, signAndExecuteTransactionBlock } = useWallet();
   const [republican, setRepublican] = useState<string>('');
   const [democrat, setDemocrat] = useState<string>('');
 
@@ -38,65 +35,37 @@ const MakePrediction = () => {
 
 
 
+
+
   const handlePrediction = async () => {
-    // only the first input box is needed as A + B = 538
+
     if (republican && democrat) {
 
-
-      // client
-      const client = new SuiClient({
-        transport: new SuiHTTPTransport({
-          url: getFullnodeUrl('testnet'),
-        }),
-      });
-
-
-
-      const wallet = useWallet();
-
-      if (!wallet.connected) return
-  
+      const republicanValue = toUint(republican);
+      
+      if (!connected) return;
       
       const txb = new TransactionBlock();
+
       const packageObjectId = `${PACKAGE}`;
-
-
+      
       txb.moveCall({
         target: `${packageObjectId}::kiosk_practice::make_prediction`,
-        arguments: [txb.pure.u64(333), txb.object(CLOCK)],
+        arguments: [txb.pure.u64(republicanValue), txb.object(CLOCK)],
       });
-
-
-
+      
       try {
-    
-        const predictionData = await wallet.signAndExecuteTransactionBlock({
+        const predictionData = await signAndExecuteTransactionBlock({
           transactionBlock: txb
         });
-
-
-        console.log('prediction made!', predictionData);
-
-        
-
+        console.log('Prediction made!', predictionData);
+        alert('Congrats! Your prediction has been made!');
       } catch (e) {
-          console.error('sorry the prediction failed to be created', e);
+        console.error('Sorry, the prediction failed to be created', e);
       }
-
-    
-
-
-    
     }
-
-
-
-
-
   };
-
-
-
+  
 
   if (connected) {
     return (
