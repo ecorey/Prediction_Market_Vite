@@ -1,5 +1,5 @@
 #[test_only]
-module predictrix::trial_two_tests {
+module predictrix::predictrix_tests {
 
 
     use sui::tx_context::{TxContext, Self};

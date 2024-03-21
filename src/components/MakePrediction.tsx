@@ -5,13 +5,14 @@ import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import cn from 'classnames';
+import { WebSocket } from 'ws';
 import { useWallet } from '@suiet/wallet-kit';
-
+import { getFullnodeUrl, SuiClient, SuiHTTPTransport  } from "@mysten/sui.js/client";
 import { TransactionBlock } from '@mysten/sui.js/transactions';
+import {  PACKAGE, CLOCK  } from '../../scripts/config.ts';
 
 
 
-const txb = new TransactionBlock();
 
 
 
@@ -35,17 +36,67 @@ const MakePrediction = () => {
     setValueOther((538 - numValue).toString());
   };
 
+
+
   const handlePrediction = async () => {
     // only the first input box is needed as A + B = 538
     if (republican && democrat) {
-      txb.moveCall({
-        target: '0x0::predictrix::make_prediction',
-        arguments: [
-          { index: 0, kind: "Input", type: "pure", value: toUint(republican).toString() },
-        ],
+
+
+      // client
+      const client = new SuiClient({
+        transport: new SuiHTTPTransport({
+          url: getFullnodeUrl('testnet'),
+        }),
       });
+
+
+
+      const wallet = useWallet();
+
+      if (!wallet.connected) return
+  
+      
+      const txb = new TransactionBlock();
+      const packageObjectId = `${PACKAGE}`;
+
+
+      txb.moveCall({
+        target: `${packageObjectId}::kiosk_practice::make_prediction`,
+        arguments: [txb.pure.u64(333), txb.object(CLOCK)],
+      });
+
+
+
+      try {
+    
+        const predictionData = await wallet.signAndExecuteTransactionBlock({
+          transactionBlock: txb
+        });
+
+
+        console.log('prediction made!', predictionData);
+
+        
+
+      } catch (e) {
+          console.error('sorry the prediction failed to be created', e);
+      }
+
+    
+
+
+    
     }
+
+
+
+
+
   };
+
+
+
 
   if (connected) {
     return (
@@ -97,3 +148,18 @@ const MakePrediction = () => {
 };
 
 export default MakePrediction;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

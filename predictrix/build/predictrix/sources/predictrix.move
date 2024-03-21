@@ -114,7 +114,7 @@ module predictrix::predictrix {
 
 
     #[test_only]
-    friend predictrix::trial_two_tests;
+    friend predictrix::predictrix_tests;
     
 
 
