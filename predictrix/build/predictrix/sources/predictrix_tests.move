@@ -400,40 +400,60 @@ module predictrix::predictrix_tests {
         test_scenario::next_tx(scenario_val, admin);
         {
 
+            let admin_kiosk = test_scenario::take_shared<Kiosk>(scenario_val);
+            let admin_cap = test_scenario::take_from_sender<KioskOwnerCap>(scenario_val);
+            let policy = test_scenario::take_shared<TransferPolicy<Prediction>>(scenario_val);
 
-            // let predict = test_scenario::take_from_sender<Prediction>(scenario_val);
+
+            let predict = test_scenario::take_from_sender<Prediction>(scenario_val);
             
 
             // admin lists the prediction in their kiosk
-            // let prediction_id = object::id(&predict);
+            let prediction_id = object::id(&predict);
 
 
             // delete_prediction(predict, test_scenario::ctx(scenario_val));
 
-            // kiosk::place(&mut admin_kiosk_two, &admin_cap_two, predict);
-            // assert_eq(kiosk::has_item(&admin_kiosk_two, prediction_id), true);
+            kiosk::place(&mut admin_kiosk, &admin_cap, predict);
+            assert_eq(kiosk::has_item(&admin_kiosk, prediction_id), true);
 
 
 
             
-            // kiosk::list<Prediction>(&mut admin_kiosk_two, &admin_cap_two, prediction_id, 10);
-            // test_scenario::return_to_sender(scenario_val, admin_cap_two);
+            kiosk::list<Prediction>(&mut admin_kiosk, &admin_cap, prediction_id, 10);
+            // test_scenario::return_to_sender(scenario_val, admin_cap);
 
 
 
 
-            // let coin = coin::mint_for_testing<SUI>(10, test_scenario::ctx(scenario_val));
 
-            // let (purchased_prediction, request) = kiosk::purchase<Prediction>(&mut kiosk, prediction_id, coin);
+            let user_kiosk = test_scenario::take_shared<Kiosk>(scenario_val);
+            let user_cap = test_scenario::take_from_sender<KioskOwnerCap>(scenario_val);
 
-            // let purchased_prediction_id = object::id<Prediction>(&purchased_prediction);
+            let coin = coin::mint_for_testing<SUI>(10, test_scenario::ctx(scenario_val));
 
-            // kiosk::place(&mut kiosk, &cap, purchased_prediction);
-            // assert_eq(kiosk::has_item(&kiosk, purchased_prediction_id), true);
+            let (purchased_prediction, request) = kiosk::purchase<Prediction>(&mut admin_kiosk, prediction_id, coin);
 
-            // // kiosk::list<Prediction>(&mut kiosk, &cap, purchased_prediction_id, 100);
+            let purchased_prediction_id = object::id<Prediction>(&purchased_prediction);
+
+            kiosk::place(&mut user_kiosk, &user_cap, purchased_prediction);
+            assert_eq(kiosk::has_item(&user_kiosk, purchased_prediction_id), true);
+
+
+            // kiosk::list<Prediction>(&mut kiosk, &cap, purchased_prediction_id, 100);
            
-            // transfer_policy::confirm_request(&policy, request);
+
+
+            transfer_policy::confirm_request(&policy, request);
+
+
+            
+            test_scenario::return_to_sender(scenario_val, admin_cap);
+            test_scenario::return_shared(admin_kiosk);
+            test_scenario::return_shared(policy);
+
+            test_scenario::return_to_sender(scenario_val, user_cap);
+            test_scenario::return_shared(user_kiosk);
 
 
 
