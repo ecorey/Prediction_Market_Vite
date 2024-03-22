@@ -61,7 +61,7 @@ export const PACKAGE = "0xcd57af4426f53698e011dac73ca0703d6399eb8f83fbd9e3ddd75c
 export const START_GAME_CAP = "0xa4ecb4b05c0137e5178658a8beec84373e5d90de20b590312ed071e5ed23a5c4";
 export const END_GAME_CAP = "0xdab932fd52efb97360f96789ee0973cb637e5331fc1bc818ae13bbaa3e1a86fb";
 export const GAME_OWNER_CAP = "0xca747f2cdafe81220973ed5be0aa468102628585ec6af232f7191c48ce9dbdf0";
-export const TRANSFER_POLICY  = "export const itemType = `${PACKAGE}::kiosk_practice::Prediction`;";
+export const TRANSFER_POLICY  = "";
 export const TRANSFER_POLICY_CAP = "0x2ff59d79e8c34f79d62f8c2ee4db27cf2bc00efca6b94783ad2e0d96274d9028";
 export const PUBLISHER = "";
 export const UPGRADE_CAP = "";
