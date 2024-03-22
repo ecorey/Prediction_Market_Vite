@@ -440,7 +440,7 @@ module predictrix::predictrix_tests {
             assert_eq(kiosk::has_item(&user_kiosk, purchased_prediction_id), true);
 
 
-            // kiosk::list<Prediction>(&mut kiosk, &cap, purchased_prediction_id, 100);
+            kiosk::list<Prediction>(&mut user_kiosk, &user_cap, purchased_prediction_id, 100);
            
 
 
