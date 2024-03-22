@@ -72,6 +72,10 @@ module predictrix::predictrix_tests {
 
 
 
+
+
+
+
     #[test]
     public fun predictix_tests() {
 
@@ -313,7 +317,7 @@ module predictrix::predictrix_tests {
 
 
 
-    public fun kiosk_tests(){
+    public fun purchase_tests(){
 
 
         let admin = @0x1;
@@ -387,24 +391,16 @@ module predictrix::predictrix_tests {
             let predict = test_scenario::take_from_sender<Prediction>(scenario_val);
             
 
-            // admin lists the prediction in their kiosk
             let prediction_id = object::id(&predict);
 
-
-            // delete_prediction(predict, test_scenario::ctx(scenario_val));
 
             kiosk::place(&mut admin_kiosk, &admin_cap, predict);
             assert_eq(kiosk::has_item(&admin_kiosk, prediction_id), true);
 
 
 
-            
             kiosk::list<Prediction>(&mut admin_kiosk, &admin_cap, prediction_id, 10);
-            // test_scenario::return_to_sender(scenario_val, admin_cap);
-
-
-
-
+            
 
             let user_kiosk = test_scenario::take_shared<Kiosk>(scenario_val);
             let user_cap = test_scenario::take_from_sender<KioskOwnerCap>(scenario_val);
@@ -436,9 +432,7 @@ module predictrix::predictrix_tests {
 
 
 
-
         };
-
 
 
 
@@ -473,12 +467,103 @@ module predictrix::predictrix_tests {
 
 
 
-        // USER CLAIMS WINNER
+        // START GAME
+        test_scenario::next_tx(scenario_val, admin);
+        {
+            let start_game_cap = test_scenario::take_from_sender<StartGameCap>(scenario_val);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario_val)); 
+            let price = 100;
+
+            let predict_epoch = set_predict_epoch(222, 333, test_scenario::ctx(scenario_val));
+            let report_epoch = set_report_epoch(333, 444, test_scenario::ctx(scenario_val));
+
+
+
+            start_game(start_game_cap, price, predict_epoch, report_epoch, &clock, test_scenario::ctx(scenario_val));
+
+
+            clock::destroy_for_testing(clock); 
+
+        };
+
+
+
+
+        // CREATE KIOSKS AND MAKE A PREDICTION
+        test_scenario::next_tx(scenario_val, admin);
+        {
+           // ADMIN
+
+            // create admin kiosk and transfer policy
+            let (admin_kiosk_two, admin_cap_two) = kiosk::new(test_scenario::ctx(scenario_val));
+            transfer::public_share_object(admin_kiosk_two);
+            transfer::public_transfer(admin_cap_two, admin);
+
+            let admin_cap_two = test_scenario::take_from_sender<KioskOwnerCap>(scenario_val); 
+            test_scenario::return_to_sender(scenario_val, admin_cap_two);
+
+
+            let admin_policy_two = test_scenario::take_shared<TransferPolicy<Prediction>>(scenario_val);
+            test_scenario::return_shared(admin_policy_two);
+            
+
+
+            // admin makes a prediction
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
+            let guess = 444;
+
+            make_prediction(guess, &clock, test_scenario::ctx(scenario_val));
+
+
+
+            // USER1  
+            // Create a Kiosk share it public and transfer the cap to owner
+            let (user_kiosk_two, user_cap_two) = kiosk::new(test_scenario::ctx(scenario_val));
+            transfer::public_share_object(user_kiosk_two);
+            transfer::public_transfer(user_cap_two, user1);
+
+            let user_cap_two = test_scenario::take_from_sender<KioskOwnerCap>(scenario_val); 
+            test_scenario::return_to_sender(scenario_val, user_cap_two);
+            
+
+
+            clock::destroy_for_testing(clock); 
+            
+
+        };
+
+
+
+
+        // CLOSE GAME
+        test_scenario::next_tx(scenario_val, admin);
+        {
+           
+        
+        
+            let game = test_scenario::take_shared<Game>(scenario_val);
+
+            let end_game_cap = test_scenario::take_from_sender<EndGameCap>(scenario_val);
+           
+            let game_closed = close_game(end_game_cap, &mut game, 444, test_scenario::ctx(scenario_val)); 
+
+            assert!(game_closed == true, 0);
+
+            test_scenario::return_shared(game);
+
+        };
+
+
+
+
+        // CLAIM WINNINER
         test_scenario::next_tx(scenario_val, admin);
         {
            
 
+
         };
+
 
 
 
@@ -489,6 +574,7 @@ module predictrix::predictrix_tests {
            
 
         };
+
 
 
 
