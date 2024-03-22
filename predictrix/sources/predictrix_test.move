@@ -302,27 +302,6 @@ module predictrix::predictrix_tests {
 
 
 
-        // USER CLAIMS WINNER
-        test_scenario::next_tx(scenario_val, admin);
-        {
-           
-
-        };
-
-
-
-
-        // TEMPLATE
-        test_scenario::next_tx(scenario_val, admin);
-        {
-           
-
-        };
-
-
-        
-        
-
 
         test_scenario::end(scenario);   
 
@@ -469,6 +448,59 @@ module predictrix::predictrix_tests {
 
 
     }
+
+
+
+
+
+
+
+
+
+
+
+    public fun winner_tests(){
+
+
+        let admin = @0x1;
+        let user1 = @0x2;
+       
+
+        
+        let scenario = init_test_helper();
+        let scenario_val = &mut scenario;
+
+
+
+
+        // USER CLAIMS WINNER
+        test_scenario::next_tx(scenario_val, admin);
+        {
+           
+
+        };
+
+
+
+
+        // TEMPLATE
+        test_scenario::next_tx(scenario_val, admin);
+        {
+           
+
+        };
+
+
+
+
+        test_scenario::end(scenario);  
+
+
+
+        
+    }
+
+        
 
     
 
