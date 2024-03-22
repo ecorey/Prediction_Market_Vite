@@ -50,6 +50,7 @@ module predictrix::predictrix_tests {
     // ###################################
 
 
+
     fun init_test_helper() : test_scenario::Scenario {
 
             let admin = @0x1;
@@ -70,8 +71,6 @@ module predictrix::predictrix_tests {
             scenario
 
         }
-
-
 
 
 
@@ -129,7 +128,6 @@ module predictrix::predictrix_tests {
 
             
         };
-
 
 
 
@@ -451,9 +449,6 @@ module predictrix::predictrix_tests {
 
 
 
-
-
-
     public fun winner_tests(){
 
 
@@ -575,18 +570,6 @@ module predictrix::predictrix_tests {
 
 
         };
-
-
-
-
-
-        // TEMPLATE
-        test_scenario::next_tx(scenario_val, admin);
-        {
-           
-
-        };
-
 
 
 
