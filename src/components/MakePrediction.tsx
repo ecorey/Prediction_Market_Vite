@@ -59,7 +59,7 @@ const MakePrediction = () => {
           transactionBlock: txb
         });
         console.log('Prediction made!', predictionData);
-        alert('Congrats! Your prediction has been made!');
+        alert(`Congrats! Your prediction has been made! \n Digest: ${predictionData.digest}`);
       } catch (e) {
         console.error('Sorry, the prediction failed to be created', e);
       }
