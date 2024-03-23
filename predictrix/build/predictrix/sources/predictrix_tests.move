@@ -121,8 +121,8 @@ module predictrix::predictrix_tests {
 
             let price = 100;
 
-            let predict_epoch = set_predict_epoch(222, 333, test_scenario::ctx(scenario_val));
-            let report_epoch = set_report_epoch(333, 444, test_scenario::ctx(scenario_val));
+            let predict_epoch = set_predict_epoch(0, 12000, test_scenario::ctx(scenario_val));
+            let report_epoch = set_report_epoch(0, 12000, test_scenario::ctx(scenario_val));
 
 
             start_game(start_game_cap, price, predict_epoch, report_epoch, &clock, test_scenario::ctx(scenario_val));
@@ -254,8 +254,8 @@ module predictrix::predictrix_tests {
 
             let price = 100;
 
-            let predict_epoch = set_predict_epoch(1711171075193, 1730592000000, test_scenario::ctx(scenario_val));
-            let report_epoch = set_report_epoch(1711171075193, 1730592000000, test_scenario::ctx(scenario_val));
+            let predict_epoch = set_predict_epoch(0, 12000, test_scenario::ctx(scenario_val));
+            let report_epoch = set_report_epoch(0, 12000, test_scenario::ctx(scenario_val));
 
 
 
