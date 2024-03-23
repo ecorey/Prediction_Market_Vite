@@ -331,11 +331,12 @@ module predictrix::predictrix_tests {
             
             kiosk::list<Prediction>(&mut admin_kiosk, &cap, prediction_id, 10);
             kiosk::delist<Prediction>(&mut admin_kiosk, &cap, prediction_id);
+            let prediction = kiosk::take<Prediction>(&mut admin_kiosk, &cap, prediction_id);
 
             test_scenario::return_to_sender(scenario_val, cap);
             test_scenario::return_shared(admin_kiosk);
 
-
+            test_scenario::return_to_sender(scenario_val, prediction);
 
         };
 
@@ -394,7 +395,7 @@ module predictrix::predictrix_tests {
         test_scenario::next_tx(scenario_val, admin);
         {
             
-            // let prediction = test_scenario::take_from_sender<Prediction>(scenario_val);
+            let prediction = test_scenario::take_from_sender<Prediction>(scenario_val);
             let game = test_scenario::take_shared<Game>(scenario_val);
             let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
            
@@ -405,7 +406,7 @@ module predictrix::predictrix_tests {
             clock::destroy_for_testing(clock);
             test_scenario::return_shared(game);
 
-            // test_scenario::return_to_sender(scenario_val, prediction);
+            test_scenario::return_to_sender(scenario_val, prediction);
 
 
 
