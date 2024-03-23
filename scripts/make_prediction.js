@@ -47,11 +47,9 @@ const client = new SuiClient({
 
 
         // Create a new coin with balance 100, based on the coins used as gas payment.
-        // You can define any balance here.
         const [coin] = txb.splitCoins(txb.gas, [txb.pure(1000000)]);
 
     
-        // make_prediction( predict: u64, payment: Coin<SUI>, game: &mut Game, clock: &Clock, ctx: &mut TxContext)
         txb.moveCall({
             target: `${PACKAGE}::kiosk_practice::make_prediction`,
             arguments: [  txb.pure.u64(GUESS), txb.object(coin), txb.object(GAME_ID), txb.object(CLOCK) ],
