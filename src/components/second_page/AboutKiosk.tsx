@@ -31,7 +31,8 @@ const AboutKiosk = () => {
       </Typography>
       
       <Typography className={cn("px-2 py-2 m-2")}  variant="body1" gutterBottom component="div" sx={{ color: 'white', }}>
-        Predictrix is a decentralized application that leverages the power of SUI and uses the SUI kiosk to manage predictions made on this site. You can connect your wallet to manage your prediction using the KIOSK here. 
+        Predictrix is a decentralized application that leverages the power of SUI and uses the SUI kiosk to manage predictions made on this site. You can connect your wallet to manage your prediction using the KIOSK here.
+        Any information required can be found by using a blockchain explorer to search for your wallet and then the needed id numbers.
       </Typography>
 
       <Typography className={cn("px-2 py-2 m-2")}  variant="body1" gutterBottom component="div" sx={{ color: 'white', }}>
