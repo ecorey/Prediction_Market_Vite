@@ -575,6 +575,16 @@ module predictrix::predictrix {
     }
 
 
+    // game status
+     public fun game_closed(game_instance: &Game,  ctx: &mut TxContext) : bool {
+        
+        game_instance.game_closed = true;
+        
+
+        game_instance.game_closed
+
+     }
+
 
     
     // ###################
