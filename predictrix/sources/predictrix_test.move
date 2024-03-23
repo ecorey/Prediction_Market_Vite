@@ -418,13 +418,13 @@ module predictrix::predictrix_tests {
             std::debug::print(&clock);
 
 
-            // claim_winner(prediction, &mut game, &clock, test_scenario::ctx(scenario_val));
+            claim_winner(prediction, &mut game, &clock, test_scenario::ctx(scenario_val));
             
 
             clock::destroy_for_testing(clock);
             test_scenario::return_shared(game);
 
-            test_scenario::return_to_sender(scenario_val, prediction);
+            // test_scenario::return_to_sender(scenario_val, prediction);
 
 
 
