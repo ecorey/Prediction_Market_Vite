@@ -408,76 +408,11 @@ module predictrix::predictrix {
         let pot = &mut game.pot;
 
         event::emit(GamePotIncreased { amount: coin::value<SUI>(&deposit) });
-        
+
         balance::join(pot, coin::into_balance(deposit));
 
         
     }
-
-
-
-
-    
-
-    
-    // ###################################
-    // ############GETTER LOGIC###########
-    // ###################################
-
-    struct GameBalance has copy, drop {
-        balance: u64,
-    }
-
-
-    // gets the game balance
-    public fun balance(game: &Game) : u64 {
-        
-        let bal = balance::value<SUI>(&game.pot);
-
-        event::emit(GameBalance {
-            balance: bal,
-        });
-
-        bal
-    }
-
-
-
-    
-
-
-
-    
-    // ###################
-    // WITHDRAW FUNCTIONS#
-    // ###################
-
-    // withdraw from a personal kiosk [untested]
-    public fun withdraw_balance_from_kiosk(kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, amount: Option<u64>, ctx: &mut TxContext) : Coin<SUI> {
-        kiosk::withdraw(kiosk, kiosk_owner_cap, amount, ctx)
-    }
-
-
-
-    // withdraw from the transfer policy [untested]
-    public fun withdraw_balance_from_tranfer_policy( transfer_policy: &mut TransferPolicy<Prediction>, transfer_policy_cap: &TransferPolicyCap<Prediction>, amount: Option<u64>, ctx: &mut TxContext ) : Coin<SUI> {
-        tp::withdraw(transfer_policy, transfer_policy_cap, amount, ctx)
-    }
-
-
-
-    // withdraw from game balance
-    public fun withdraw_balance_from_game(_: &GameOwnerCap, game: &mut Game, amount: u64, ctx: &mut TxContext) {
-       
-        assert!(game.game_closed, EGameNotClosed);  
-        
-        let withdrawal = balance::split(&mut game.pot, amount);
-    
-        let bal = coin::from_balance(withdrawal, ctx);
-
-        transfer::public_transfer(bal, tx_context::sender(ctx));
-    }
-
 
 
 
@@ -617,6 +552,60 @@ module predictrix::predictrix {
 
 
 
+
+    // ###################################
+    // ############GETTER LOGIC###########
+    // ###################################
+
+    struct GameBalance has copy, drop {
+        balance: u64,
+    }
+
+
+    // gets the game balance
+    public fun balance(game: &Game) : u64 {
+        
+        let bal = balance::value<SUI>(&game.pot);
+
+        event::emit(GameBalance {
+            balance: bal,
+        });
+
+        bal
+    }
+
+
+
+    
+    // ###################
+    // WITHDRAW FUNCTIONS#
+    // ###################
+
+    // withdraw from a personal kiosk [untested]
+    public fun withdraw_balance_from_kiosk(kiosk: &mut Kiosk, kiosk_owner_cap: &KioskOwnerCap, amount: Option<u64>, ctx: &mut TxContext) : Coin<SUI> {
+        kiosk::withdraw(kiosk, kiosk_owner_cap, amount, ctx)
+    }
+
+
+
+    // withdraw from the transfer policy [untested]
+    public fun withdraw_balance_from_tranfer_policy( transfer_policy: &mut TransferPolicy<Prediction>, transfer_policy_cap: &TransferPolicyCap<Prediction>, amount: Option<u64>, ctx: &mut TxContext ) : Coin<SUI> {
+        tp::withdraw(transfer_policy, transfer_policy_cap, amount, ctx)
+    }
+
+
+
+    // withdraw from game balance
+    public fun withdraw_balance_from_game(_: &GameOwnerCap, game: &mut Game, amount: u64, ctx: &mut TxContext) {
+       
+        assert!(game.game_closed, EGameNotClosed);  
+        
+        let withdrawal = balance::split(&mut game.pot, amount);
+    
+        let bal = coin::from_balance(withdrawal, ctx);
+
+        transfer::public_transfer(bal, tx_context::sender(ctx));
+    }
 
 
 
