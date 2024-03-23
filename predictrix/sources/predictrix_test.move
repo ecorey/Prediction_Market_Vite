@@ -114,7 +114,11 @@ module predictrix::predictrix_tests {
 
 
             let start_game_cap = test_scenario::take_from_sender<StartGameCap>(scenario_val);
-            let clock = clock::create_for_testing(test_scenario::ctx(scenario_val)); 
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
+
+            clock::increment_for_testing( &mut clock, 2000);
+            std::debug::print(&clock);
+
             let price = 100;
 
             let predict_epoch = set_predict_epoch(222, 333, test_scenario::ctx(scenario_val));
@@ -156,6 +160,7 @@ module predictrix::predictrix_tests {
 
             let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
 
+            clock::increment_for_testing( &mut clock, 4000);
             std::debug::print(&clock);
 
             let (kiosk, kiosk_owner_cap) = test::get_kiosk(test_scenario::ctx(scenario_val));
@@ -241,10 +246,16 @@ module predictrix::predictrix_tests {
 
             let start_game_cap = test_scenario::take_from_sender<StartGameCap>(scenario_val);
             let clock = clock::create_for_testing(test_scenario::ctx(scenario_val)); 
+            
+            
+
+            clock::increment_for_testing( &mut clock, 6000);
+            std::debug::print(&clock);
+
             let price = 100;
 
-            let predict_epoch = set_predict_epoch(222, 333, test_scenario::ctx(scenario_val));
-            let report_epoch = set_report_epoch(333, 444, test_scenario::ctx(scenario_val));
+            let predict_epoch = set_predict_epoch(1711171075193, 1730592000000, test_scenario::ctx(scenario_val));
+            let report_epoch = set_report_epoch(1711171075193, 1730592000000, test_scenario::ctx(scenario_val));
 
 
 
@@ -292,6 +303,10 @@ module predictrix::predictrix_tests {
 
             let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
             
+            clock::increment_for_testing( &mut clock, 8000);
+            std::debug::print(&clock);
+
+
             let payment = coin::mint_for_testing<SUI>(100, test_scenario::ctx(scenario_val));
 
             let game = test_scenario::take_shared<Game>(scenario_val);
@@ -399,6 +414,9 @@ module predictrix::predictrix_tests {
             let game = test_scenario::take_shared<Game>(scenario_val);
             let clock = clock::create_for_testing(test_scenario::ctx(scenario_val));
            
+            clock::increment_for_testing( &mut clock, 10000);
+            std::debug::print(&clock);
+
 
             // claim_winner(prediction, &mut game, &clock, test_scenario::ctx(scenario_val));
             
