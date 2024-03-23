@@ -13,8 +13,8 @@ const theme = createTheme({
 const Footer = () => {
   return (
     <ThemeProvider theme={theme}>
-    <Box sx={{  p: 3, bottom: 0, width: '100%' }}>
-      <Typography variant="body1" color="white" align="center">
+    <Box sx={{  p: 3, bottom: 0, width: '100%',  }}>
+      <Typography variant="body1" color="red" align="center">
         © 2024 PREDICTRIX.
       </Typography>
     </Box>

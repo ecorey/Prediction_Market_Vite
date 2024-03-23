@@ -31,7 +31,7 @@ const GameStatus = () => {
        
        }}>
 
-      <Typography className={cn("px-2 py-2 m-2")}  variant="body1" gutterBottom component="div" sx={{ color: 'red', fontSize: '1.875rem', fontWeight: 'bold' }}>
+      <Typography className={cn("px-2 py-2 m-2")}  variant="body1" gutterBottom component="div" sx={{ color: 'white', fontSize: '1.875rem', fontWeight: 'bold' }}>
         Game OPEN
       </Typography>
       
@@ -73,6 +73,15 @@ const GameStatus = () => {
 
       <Typography className={cn("px-2 py-2 m-2")}  variant="body1" gutterBottom component="div" sx={{ color: 'white', }}>
         Predictrix will pull the final results using a switchboard oracle from aggregated results from .gov official sources after an offical count has been etablished. Predictrix is a neutral platform and will only use the officially established result and has a long report end time in the case of a prolonged or longer than anticipated result to be established.
+      </Typography>
+
+      <Typography className={cn("px-2 py-2 m-2")}  variant="body1" gutterBottom component="div" sx={{ color: 'white', }}>
+        ***
+      </Typography>
+
+      <Typography className={cn("px-2 py-2 m-2")}  variant="body1" gutterBottom component="div" sx={{ color: 'white', }}>
+       TO CLAIM WINNINGS: After connecting your wallet, please enter your prediction ID and click the claim winnings button found below. 
+       The prediction ID can be found by looking at the prediction you placed that is found in your SUI wallet or kiosk.
       </Typography>
 
     </Box>

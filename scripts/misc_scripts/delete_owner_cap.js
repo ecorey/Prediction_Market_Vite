@@ -1,16 +1,16 @@
 import { getFullnodeUrl, SuiClient, SuiHTTPTransport  } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import walletDev from './dev-wallet.json' assert { type: 'json' };
+import walletDev from '../dev-wallet.json' assert { type: 'json' };
 
 import { WebSocket } from 'ws';
 
-import {  COIN_TO_ADD, GAME_ID, PACKAGE  } from './config.js';
+import {  PACKAGE, GAME_OWNER_CAP } from '../config.js';
 
 
-// ######################################
-// ############ADD BALANCE TO GAME#######
-// ######################################
+// ###################################
+// ############DELETE OWNER CAP#######
+// ###################################
 
 
 
@@ -44,12 +44,14 @@ const client = new SuiClient({
 
 
 
-
+        
 
         txb.moveCall({
-            target: `${PACKAGE}::kiosk_practice::add_game_balance`,
-            arguments: [ txb.object(GAME_ID), txb.object(COIN_TO_ADD) ],
+            target: `${PACKAGE}::kiosk_practice::delete_game_owner_cap`,
+            arguments: [ txb.object(GAME_OWNER_CAP)],
         });
+
+
 
 
 

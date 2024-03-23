@@ -1,48 +1,35 @@
-import { getFullnodeUrl, SuiClient, SuiHTTPTransport } from "@mysten/sui.js/client";
+import { getFullnodeUrl, SuiClient, SuiHTTPTransport  } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
+import { TransactionBlock } from "@mysten/sui.js/transactions";
+import walletDev from '../dev-wallet.json' assert { type: 'json' };
+
 import { WebSocket } from 'ws';
-import walletDev from './dev-wallet.json' assert { type: 'json' };
 
-import {  PACKAGE } from './config.js';
-
+import {  COIN_TO_ADD, GAME_ID, PACKAGE  } from '../config.js';
 
 
-// UNDER DEVELOPMENT****************************
-// *********************************************
-// #############################################
-// ############SUBSCRIBE EVENTS#################
-// #############################################
+// ######################################
+// ############ADD BALANCE TO GAME#######
+// ######################################
 
 
-// Initialize keypair
+
+
+// generate a keypair
 const privateKeyArray = walletDev.privateKey.split(',').map(num => parseInt(num, 10));
 const privateKeyBytes = new Uint8Array(privateKeyArray);
 const keypairdev = Ed25519Keypair.fromSecretKey(privateKeyBytes);
 
 
 
-// contract events
-const eventsToSubscribe = [ 
-    `${PACKAGE}::kiosk_practice::TimeEvent`,
-    `${PACKAGE}::kiosk_practice::GameStarted`,
-    `${PACKAGE}::kiosk_practice::PredictionMade`,
-    `${PACKAGE}::kiosk_practice::GameOpen`,
-    
-];
 
-
-
-
-// Client connection to Sui testnet
+// client
 const client = new SuiClient({
     transport: new SuiHTTPTransport({
         url: getFullnodeUrl('testnet'),
         WebSocketConstructor: WebSocket
     }),
 });
-
-
-
 
 
 
@@ -57,27 +44,14 @@ const client = new SuiClient({
 
 
 
-        
-
-        // let unsubscribe = await client.subscribeEvent({
-        //     filter: { Package },
-        //     onMessage: (event) => {
-        //         console.log('subscribeEvent', JSON.stringify(event, null, 2));
-        //     },
-        // });
-         
-       
-
-        // await unsubscribe();
 
 
+        txb.moveCall({
+            target: `${PACKAGE}::kiosk_practice::add_game_balance`,
+            arguments: [ txb.object(GAME_ID), txb.object(COIN_TO_ADD) ],
+        });
 
 
-
-
-
-
-      
 
         
         // finalize the transaction block

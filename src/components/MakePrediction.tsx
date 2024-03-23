@@ -112,7 +112,7 @@ const MakePrediction = () => {
         m: 1,
         width: '100%',
       }}>
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h4" gutterBottom sx={{ color: 'blue', }}>
           Make Prediction
         </Typography>
 

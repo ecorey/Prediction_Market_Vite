@@ -2,9 +2,9 @@ import { getFullnodeUrl, SuiClient, SuiHTTPTransport } from "@mysten/sui.js/clie
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { WebSocket } from 'ws';
-import wallet from './dev-wallet.json' assert { type: 'json' };
+import wallet from '../dev-wallet.json' assert { type: 'json' };
 import { KioskClient, Network, KioskTransaction } from '@mysten/kiosk';
-import {  PREDICTION_TWO, ITEMTYPE } from './config.js';
+import {  PREDICTION_TWO, ITEMTYPE } from '../config.js';
 
 // generate a keypair
 const privateKeyArray = wallet.privateKey.split(',').map(num => parseInt(num, 10));
