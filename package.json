@@ -14,9 +14,12 @@
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^5.15.10",
     "@mysten/sui.js": "0.45.1",
+    "@mysten/wallet-adapter-react": "^11.0.0",
+    "@suiet/wallet-adapter": "^0.0.19",
     "@suiet/wallet-kit": "^0.2.22",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "ws": "^8.16.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.56",

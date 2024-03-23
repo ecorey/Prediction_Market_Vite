@@ -1,13 +1,36 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import cn from 'classnames';
 import { useWallet } from '@suiet/wallet-kit';
-import { TransactionBlock } from '@mysten/sui.js/transactions';
-import {  PACKAGE, CLOCK  } from '../../scripts/config.ts';
 
+
+import { TransactionBlock } from '@mysten/sui.js/transactions';
+import {  PACKAGE, CLOCK, GAME_ID  } from '../../scripts/config.ts';
+
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+
+const theme = createTheme({
+  typography: {
+    fontFamily: "'Finger Paint', sans-serif",
+  },
+});
+
+const textFieldStyle = {
+  input: {
+    color: "white", 
+    fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif", 
+    backgroundColor: "rgba(0, 0, 0, 0.5)", 
+    borderRadius: "4px", 
+  },
+  notchedOutline: {
+    borderWidth: "1px",
+    borderColor: "white !important"
+  }
+};
 
 
 
@@ -47,12 +70,20 @@ const MakePrediction = () => {
       
       const txb = new TransactionBlock();
 
-      const packageObjectId = `${PACKAGE}`;
+
+      txb.setGasBudget(10000000);
+
+
+        const [coin] = txb.splitCoins(txb.gas, [txb.pure(1000000)]);
+
+
       
       txb.moveCall({
-        target: `${packageObjectId}::kiosk_practice::make_prediction`,
-        arguments: [txb.pure.u64(republicanValue), txb.object(CLOCK)],
+        target: `${PACKAGE}::kiosk_practice::make_prediction`,
+        arguments: [txb.pure.u64(republicanValue), coin, txb.object(GAME_ID), txb.object(CLOCK)],
       });
+
+
       
       try {
         const predictionData = await signAndExecuteTransactionBlock({
@@ -69,18 +100,19 @@ const MakePrediction = () => {
 
   if (connected) {
     return (
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        p: 2, 
-        border: '1px solid white',  
-        boxShadow: '0px 0px 10px orange', 
-        borderRadius: '4px', 
-        m: 1, 
-        width: '100%',  
+      <ThemeProvider theme={theme}>
+      <Box sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        p: 2,
+        border: '1px solid white',
+        boxShadow: '0px 0px 10px orange',
+        borderRadius: '4px',
+        m: 1,
+        width: '100%',
       }}>
-        <Typography className={cn("px-2 py-2 m-2 pixelify_sans")} variant="h4" gutterBottom>
+        <Typography variant="h4" gutterBottom>
           Make Prediction
         </Typography>
 
@@ -90,10 +122,13 @@ const MakePrediction = () => {
             variant="outlined"
             placeholder="REPUBLICANS"
             value={republican}
-            onChange={(e) => {
-              const value = e.target.value;
-              setRepublican(value);
-              handleInput(setDemocrat, value);
+            onChange={(e) => setRepublican(e.target.value)}
+            InputProps={{
+              style: textFieldStyle.input,
+            }}
+            // Apply custom styles to the notched outline
+            InputLabelProps={{
+              style: { color: 'white' },
             }}
           />
           <Typography variant="h6">/</Typography>
@@ -102,33 +137,19 @@ const MakePrediction = () => {
             variant="outlined"
             placeholder="DEMOCRATS"
             value={democrat}
-            onChange={(e) => {
-              const value = e.target.value;
-              setDemocrat(value);
-              handleInput(setRepublican, value);
+            onChange={(e) => setDemocrat(e.target.value)}
+            InputProps={{
+              style: textFieldStyle.input,
+            }}
+            InputLabelProps={{
+              style: { color: 'white' },
             }}
           />
-
           <Button variant="outlined" onClick={handlePrediction}>Make Prediction</Button>
         </Box>
       </Box>
-    );
-  }
+    </ThemeProvider>
+  );
 };
-
+};
 export default MakePrediction;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
