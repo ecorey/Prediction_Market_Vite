@@ -134,14 +134,29 @@ const MakePrediction = () => {
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, pb: 2 }}>
           <TextField
-            id="input-republican"
-            variant="outlined"
-            placeholder="REPUBLICANS"
-            value={republican}
-            onChange={(e) => handleRepublicanChange(e.target.value)}
-            InputProps={{ style: textFieldStyle.input }}
-            InputLabelProps={{ style: { color: 'white' } }}
-          />
+              id="input-republican"
+              variant="outlined"
+              placeholder="REPUBLICANS"
+              value={republican}
+              onChange={(e) => handleRepublicanChange(e.target.value)}
+              InputProps={{
+                style: textFieldStyle.input,
+              }}
+              InputLabelProps={{ style: { color: 'white' } }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: 'white', // Default state
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'white', // Hover state
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'white', // Focused state
+                  },
+                }
+              }}
+            />
             <Typography variant="h6">/</Typography>
             <TextField
             id="input-democrat"
@@ -149,8 +164,23 @@ const MakePrediction = () => {
             placeholder="DEMOCRATS"
             value={democrat}
             onChange={(e) => handleDemocratChange(e.target.value)}
-            InputProps={{ style: textFieldStyle.input }}
+            InputProps={{
+              style: textFieldStyle.input,
+            }}
             InputLabelProps={{ style: { color: 'white' } }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: 'white', // Default state
+                },
+                '&:hover fieldset': {
+                  borderColor: 'white', // Hover state
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: 'white', // Focused state
+                },
+              }
+            }}
           />
             <Button variant="outlined" onClick={handlePrediction} sx={{ color: 'white', borderColor: 'white', '&:hover': { borderColor: 'white', backgroundColor: 'rgba(255, 255, 255, 0.1)' } }}>
               Make Prediction
