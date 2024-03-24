@@ -1,5 +1,5 @@
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
-import wallet from '../dev-wallet.json' assert { type: 'json' };
+import wallet from './dev-wallet.json' assert { type: 'json' };
 
 import { decodeSuiPrivateKey } from '@mysten/sui.js/cryptography';
 

@@ -35,133 +35,123 @@ const MakePrediction = () => {
   const ensurePositiveInteger = (value: string) => {
     const parsed = parseInt(value, 10);
     return isNaN(parsed) || parsed < 0 ? 0 : parsed;
+    
   };
 
+
+  // Ensure value is a positive integer or fallback to 0
+  const toUint = (value: string): number => {
+  const num = parseInt(value, 10);
+  return isNaN(num) || num < 0 ? 0 : num;
+  };
+
+
+  // input boxes will always be A + B = 538
+  const handleInput = (setValueOther: React.Dispatch<React.SetStateAction<string>>, value: string) => {
+    const numValue = toUint(value);
+    setValueOther((538 - numValue).toString());
+  };
+
+
   const handleRepublicanChange = (value: string) => {
-    const numValue = ensurePositiveInteger(value);
-    setRepublican(value); 
-    setDemocrat(`${538 - numValue}`); 
+    const numValue = Math.max(parseInt(value, 10) || 0, 0);
+    setRepublican(value);
+    setDemocrat(`${Math.max(538 - numValue, 0).toString()}`);
   };
 
   const handleDemocratChange = (value: string) => {
-    const numValue = ensurePositiveInteger(value);
-    setDemocrat(value); 
-    setRepublican(`${538 - numValue}`); 
+    const numValue = Math.max(parseInt(value, 10) || 0, 0);
+    setDemocrat(value);
+    setRepublican(`${Math.max(538 - numValue, 0).toString()}`);
   };
+
+  
+
+
 
   const handlePrediction = async () => {
-    if (!connected) {
-      alert("Please connect your wallet.");
-      return;
-    }
+    
+  if (republican && democrat) {
 
-    const republicanValue = ensurePositiveInteger(republican);
-    const democratValue = ensurePositiveInteger(democrat);
-
-    // Ensure the total equals 538
-    if (republicanValue + democratValue !== 538) {
-      alert("The total should be 538.");
-      return;
-    }
-
-    const txb = new TransactionBlock();
-
-    txb.setGasBudget(10000000);
-
-    const [coin] = txb.splitCoins(txb.gas, [txb.pure(1000000)]);
+      const republicanValue = toUint(republican);
+      
+      if (!connected) return;
+      
+      const txb = new TransactionBlock();
 
 
-    txb.moveCall({
+      txb.setGasBudget(10000000);
 
-      target: `${PACKAGE}::predictrix::make_prediction`,
-      arguments: [txb.pure.u64(republicanValue), coin, txb.object(GAME_ID), txb.object(CLOCK)],
 
-    });
+        const [coin] = txb.splitCoins(txb.gas, [txb.pure(1000000)]);
 
-    try {
-      const predictionData = await signAndExecuteTransactionBlock({
-        transactionBlock: txb,
+
+      
+      txb.moveCall({
+        target: `${PACKAGE}::predictrix::make_prediction`,
+        arguments: [txb.pure.u64(republicanValue), coin, txb.object(GAME_ID), txb.object(CLOCK)],
       });
-      console.log('Prediction made!', predictionData);
-      alert(`Congrats! Your prediction has been made! \n Digest: ${predictionData.digest}`);
-    } catch (error) {
-      console.error('Sorry, the prediction failed to be created', error);
-      alert("Sorry, the prediction failed to be created.");
+
+
+      
+      try {
+        const predictionData = await signAndExecuteTransactionBlock({
+          transactionBlock: txb
+        });
+        console.log('Prediction made!', predictionData);
+        alert(`Congrats! Your prediction has been made! \n Digest: ${predictionData.digest}`);
+      } catch (e) {
+        console.error('Sorry, the prediction failed to be created', e);
+      }
     }
   };
+
+
+
 
   if (!connected) {
     return null;
   }
 
-  return (
-    <ThemeProvider theme={theme}>
-      <Box sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        p: 2,
-        border: '1px solid white',
-        boxShadow: '0px 0px 10px orange',
-        borderRadius: '4px',
-        m: 1,
-        width: '100%',
-      }}>
-        <Typography variant="h4" gutterBottom sx={{ color: 'blue' }}>
-          Make Prediction
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, pb: 2 }}>
-        <TextField
-          id="input-republican"
-          variant="outlined"
-          placeholder="REPUBLICANS"
-          value={republican}
-          onChange={(e) => handleRepublicanChange(e.target.value)}
-          InputProps={{
-            style: textFieldStyle.input,
-          }}
-          InputLabelProps={{ style: { color: 'white' } }}
-          // Directly apply styles to ensure the white outline is visible
-          sx={{
-            '& .MuiOutlinedInput-root': {
-              '& fieldset': {
-                borderColor: 'white', // Default state
-              },
-              '&:hover fieldset': {
-                borderColor: 'white', // Hover state
-              },
-              '&.Mui-focused fieldset': {
-                borderColor: 'white', // Focused state
-              },
-            }
-          }} />
 
-          <Typography variant="h6">/</Typography>
-          
+
+  if(connected) {
+    return (
+      <ThemeProvider theme={theme}>
+        <Box sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          p: 2,
+          border: '1px solid white',
+          boxShadow: '0px 0px 10px orange',
+          borderRadius: '4px',
+          m: 1,
+          width: '100%',
+        }}>
+          <Typography variant="h4" gutterBottom sx={{ color: 'blue' }}>
+            Make Prediction
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, pb: 2 }}>
           <TextField
+            id="input-republican"
+            variant="outlined"
+            placeholder="REPUBLICANS"
+            value={republican}
+            onChange={(e) => handleRepublicanChange(e.target.value)}
+            InputProps={{ style: textFieldStyle.input }}
+            InputLabelProps={{ style: { color: 'white' } }}
+          />
+            <Typography variant="h6">/</Typography>
+            <TextField
             id="input-democrat"
             variant="outlined"
             placeholder="DEMOCRATS"
             value={democrat}
             onChange={(e) => handleDemocratChange(e.target.value)}
-            InputProps={{
-              style: textFieldStyle.input,
-            }}
+            InputProps={{ style: textFieldStyle.input }}
             InputLabelProps={{ style: { color: 'white' } }}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': {
-                  borderColor: 'white', 
-                },
-                '&:hover fieldset': {
-                  borderColor: 'white', 
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: 'white', 
-                },
-              }
-            }} />
-
+          />
             <Button variant="outlined" onClick={handlePrediction} sx={{ color: 'white', borderColor: 'white', '&:hover': { borderColor: 'white', backgroundColor: 'rgba(255, 255, 255, 0.1)' } }}>
               Make Prediction
             </Button>
@@ -170,6 +160,5 @@ const MakePrediction = () => {
       </ThemeProvider>
     );
   };
-  
+};
   export default MakePrediction;
-  

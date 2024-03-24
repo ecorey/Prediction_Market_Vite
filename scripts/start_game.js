@@ -1,25 +1,16 @@
 import { getFullnodeUrl, SuiClient, SuiHTTPTransport  } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import walletDev from '../dev-wallet.json' assert { type: 'json' };
+import walletDev from './dev-wallet.json' assert { type: 'json' };
 
 import { WebSocket } from 'ws';
 
-import {  PACKAGE, CLOCK, GUESS, GAME_ID, DEV_WALLET  } from '../config.js';
-
-
-// ###################################
-// ############MAKE PREDICTION########
-// ###################################
-
-
-
+import {  PACKAGE, PREDICT_START_TIME, PREDICT_END_TIME, REPORT_START_TIME, REPORT_END_TIME, START_GAME_CAP, GAME_PRICE, CLOCK  } from './config.js';
 
 // generate a keypair
 const privateKeyArray = walletDev.privateKey.split(',').map(num => parseInt(num, 10));
 const privateKeyBytes = new Uint8Array(privateKeyArray);
 const keypairdev = Ed25519Keypair.fromSecretKey(privateKeyBytes);
-
 
 
 
@@ -33,7 +24,6 @@ const client = new SuiClient({
 
 
 
-
 (async () => {
     try {
      
@@ -42,23 +32,25 @@ const client = new SuiClient({
         const txb = new TransactionBlock();
 
 
-        
-        txb.setGasBudget(10000000);
-
-
-        // Create a new coin with balance 100, based on the coins used as gas payment.
-        const [coin] = txb.splitCoins(txb.gas, [txb.pure(1000000)]);
-
-    
-        txb.moveCall({
-            target: `${PACKAGE}::kiosk_practice::make_prediction`,
-            arguments: [  txb.pure.u64(GUESS), txb.object(coin), txb.object(GAME_ID), txb.object(CLOCK) ],
+        const predict_epoch = txb.moveCall({
+            target: `${PACKAGE}::predictrix::set_predict_epoch`,
+            arguments: [ txb.pure.u64(PREDICT_START_TIME), txb.pure.u64(PREDICT_END_TIME) ],
         });
 
-        
+
+        const report_epoch = txb.moveCall({
+            target: `${PACKAGE}::predictrix::set_report_epoch`,
+            arguments: [ txb.pure.u64(REPORT_START_TIME), txb.pure.u64(REPORT_END_TIME) ],
+        });
 
 
-        
+        txb.moveCall({
+            target: `${PACKAGE}::predictrix::start_game`,
+            arguments: [ txb.object(START_GAME_CAP), txb.pure.u64(GAME_PRICE), txb.object(predict_epoch), txb.object(report_epoch), txb.object(CLOCK)],
+        });
+
+
+
         // finalize the transaction block
         let txid = await client.signAndExecuteTransactionBlock({
             signer: keypairdev,
@@ -67,7 +59,7 @@ const client = new SuiClient({
         
 
 
-        // // log the transaction result
+        // log the transaction result
         console.log(`Transaction result: ${JSON.stringify(txid, null, 2)}`);
         console.log(`success: https://suiexplorer.com/txblock/${txid.digest}?network=testnet`);
 

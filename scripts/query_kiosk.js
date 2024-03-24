@@ -2,14 +2,17 @@ import { getFullnodeUrl, SuiClient, SuiHTTPTransport } from "@mysten/sui.js/clie
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { WebSocket } from 'ws';
-import wallet from '../dev-wallet.json' assert { type: 'json' };
+import wallet from './dev-wallet.json' assert { type: 'json' };
 import { KioskClient, Network, KioskTransaction } from '@mysten/kiosk';
-import {  PREDICTION_TWO, ITEMTYPE } from '../config.js';
+import {  walletThreeRef } from './config.js';
 
 // generate a keypair
 const privateKeyArray = wallet.privateKey.split(',').map(num => parseInt(num, 10));
 const privateKeyBytes = new Uint8Array(privateKeyArray);
 const keypair = Ed25519Keypair.fromSecretKey(privateKeyBytes);
+
+
+
 
 
 // client
@@ -28,7 +31,11 @@ const kioskClient = new KioskClient({
     network: Network.TESTNET,
 });
 
-// make it just a retrun kiosk and kiosk cap 
+
+
+
+
+
 
 (async () => {
     try {
@@ -36,34 +43,21 @@ const kioskClient = new KioskClient({
         
         // create Transaction Block
         const txb = new TransactionBlock();
-        
-
-        // create Kiosk TxBlock
-        const kioskTx = new KioskTransaction({ transactionBlock: txb, kioskClient });
 
 
-        // create a new kiosk public shared kiosk
-        kioskTx.create();
-
-
-        await kioskTx
-        .place({
-            itemType: `${ITEMTYPE}`,
-            item: `${PREDICTION_TWO}`,
-        });
-
-
-
-
-        kioskTx.shareAndTransferCap(`${keypair.getPublicKey().toSuiAddress()}`);
-
-        kioskTx.finalize();
 
         
+        const address = `${walletThreeRef}`;
 
-        console.log(`Prediction placed in kiosk`);
 
+
+        const { kioskOwnerCaps, kioskIds } = await kioskClient.getOwnedKiosks({ address });
+
+        console.log(`kiosk owner cap: ${kioskOwnerCaps}, and kioskIds: ${kioskIds}`);
+         
     
+
+
         
         // finalize the transaction block
         let txid = await client.signAndExecuteTransactionBlock({

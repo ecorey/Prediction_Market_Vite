@@ -2,7 +2,7 @@
 import { getFullnodeUrl, SuiClient, SuiHTTPTransport  } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import wallet from '../dev-wallet.json' assert { type: 'json' };
+import wallet from './dev-wallet.json' assert { type: 'json' };
 import { KioskClient, Network, KioskTransaction } from '@mysten/kiosk';
 import { WebSocket } from 'ws';
 
@@ -19,7 +19,7 @@ console.log(`Public Key raw bytes: ${keypair.getPublicKey().toRawBytes()}`);
 console.log(`Public Key: ${keypair.getPublicKey().toSuiAddress()}`);
 
 
-const itemType = '0xd32b20876598c0d1c903a2834c857278435c8da704a6e2183c6e1c704eb72efe::kiosk_practice::Prediction';
+const itemType = '';
 
 
 // client

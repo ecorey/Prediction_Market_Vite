@@ -1,15 +1,15 @@
 import { getFullnodeUrl, SuiClient, SuiHTTPTransport  } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import walletDev from '../dev-wallet.json' assert { type: 'json' };
+import walletDev from './dev-wallet.json' assert { type: 'json' };
 
 import { WebSocket } from 'ws';
 
-import {  PACKAGE, GAME_RESULT, GAME_ID, END_GAME_CAP } from '../config.js';
+import {  PACKAGE, GAME_OWNER_CAP } from './config.js';
 
 
 // ###################################
-// ############CLOSE GAME#############
+// ############DELETE OWNER CAP#######
 // ###################################
 
 
@@ -44,10 +44,14 @@ const client = new SuiClient({
 
 
 
+        
+
         txb.moveCall({
-            target: `${PACKAGE}::kiosk_practice::close_game`,
-            arguments: [ txb.object(END_GAME_CAP), txb.object(GAME_ID), txb.pure.u64(GAME_RESULT)],
+            target: `${PACKAGE}::predictrix::delete_game_owner_cap`,
+            arguments: [ txb.object(GAME_OWNER_CAP)],
         });
+
+
 
 
 

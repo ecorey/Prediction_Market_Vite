@@ -53,21 +53,21 @@
 export const CLOCK = "0x6";
 
 
-export const DEV_WALLET = "0x07095af51002db0e9be284b8dab97263f77fec2a1be68cd42b7dd2358a6eccdd";
-export const PACKAGE_PUBLISHER_WALLET = "0x07095af51002db0e9be284b8dab97263f77fec2a1be68cd42b7dd2358a6eccdd";
+export const DEV_WALLET = "";
+export const PACKAGE_PUBLISHER_WALLET = "";
 
-export const DEV_WALLET_SUIET = "0x8765e12c4e37aa222a40986bb3d8b893d1c0b3483b617974954e9d860436506f";
+export const DEV_WALLET_SUIET = "";
 
 // created in init
-export const PACKAGE = "0x9a36f7ee14fad9b13fc08a17c4fa065ce874e58966cdd6265e543c58d871c72e";
-export const START_GAME_CAP = "0xfe80f53dd0886dd207c1e823ec4c9f16cf50d86289c9a15ed1e138a5852645f4";
-export const END_GAME_CAP = "0x4f9aa794a64ad41f05b9634dd94863ee7ab291a1323bce48aa4c6210fa68e05c";
-export const GAME_OWNER_CAP = "0xf419f470ec657c20e890fd23b4fac55b1314e143ce1116a028a9052c735016d8";
-export const TRANSFER_POLICY  = "0x485b68d0af79b270a8bee17627eebd0cd28fcb93bc80706736ba640e54b6d4ec";
-export const TRANSFER_POLICY_CAP = "0x650776b2faa01d902032e55fde9f23a800cee5825e36aee1cfffcf03c67b47c6";
+export const PACKAGE = "";
+export const START_GAME_CAP = "";
+export const END_GAME_CAP = "";
+export const GAME_OWNER_CAP = "";
+export const TRANSFER_POLICY  = "";
+export const TRANSFER_POLICY_CAP = "";
 export const PUBLISHER = "";
 export const UPGRADE_CAP = "";
-export const ITEMTYPE = `${PACKAGE}::kiosk_practice::Prediction`;
+export const ITEMTYPE = `${PACKAGE}::predictrix::Prediction`;
 
 
 // START GAME SCRIPT
@@ -133,16 +133,3 @@ export const KIOSK_OWNER_CAP = "";
 
 
 
-// WALLETS
-
-export const devWalletPublicKeyRef = "0xb3d4cb714181fec39c22d820c963da9cfac970d3ab77c464b0dea06ce673c3e5";
-
-export const walletOneRef = "0x6dc3f9438f890ff4031f6a2151b3ca02aebf9e1522f0014a956dd8ef067e3b01";
-
-export const walletTwoRef = "0xe5f5e09892328ff278b473f485cbf85cef8a9958112023c84126aec3d32b8114";
-
-export const walletThreeRef = "0x07095af51002db0e9be284b8dab97263f77fec2a1be68cd42b7dd2358a6eccdd";
-
-export const walletFourRef = "0xf84965aee90c0e4d56a9658d78ecbc01e7908cab78cad6a62bcc558171cd2b34";
-
-export const walletFiveRef = "0x95b2e05ab1b7f9f53f7085069dd5b7f9d7d1055e406605791d87b34253bca1cb";

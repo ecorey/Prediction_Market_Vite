@@ -1,16 +1,16 @@
 import { getFullnodeUrl, SuiClient, SuiHTTPTransport  } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import walletDev from '../dev-wallet.json' assert { type: 'json' };
+import walletDev from './dev-wallet.json' assert { type: 'json' };
 
 import { WebSocket } from 'ws';
 
-import {  PACKAGE, GAME_ID  } from '../config.js';
+import {  COIN_TO_ADD, GAME_ID, PACKAGE  } from './config.js';
 
 
-// ###################################
-// ############GET GAME BALANCE#######
-// ###################################
+// ######################################
+// ############ADD BALANCE TO GAME#######
+// ######################################
 
 
 
@@ -44,21 +44,13 @@ const client = new SuiClient({
 
 
 
-        txb.setGasBudget(10000000);
 
 
-        async function logGameBalance() {
-            
-             await txb.moveCall({
-                target: `${PACKAGE}::kiosk_practice::balance`,
-                arguments: [ txb.object(GAME_ID) ],
-            });
-           
-        }
+        txb.moveCall({
+            target: `${PACKAGE}::predictrix::add_game_balance`,
+            arguments: [ txb.object(GAME_ID), txb.object(COIN_TO_ADD) ],
+        });
 
-
-        await logGameBalance();
-        
 
 
         

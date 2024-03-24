@@ -2,15 +2,14 @@ import { getFullnodeUrl, SuiClient, SuiHTTPTransport } from "@mysten/sui.js/clie
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { WebSocket } from 'ws';
-import wallet from '../dev-wallet.json' assert { type: 'json' };
+import wallet from './dev-wallet.json' assert { type: 'json' };
 import { KioskClient, Network, KioskTransaction } from '@mysten/kiosk';
-import {  walletThreeRef } from '../config.js';
+import {  PREDICTION_TWO, ITEMTYPE } from './config.js';
 
 // generate a keypair
 const privateKeyArray = wallet.privateKey.split(',').map(num => parseInt(num, 10));
 const privateKeyBytes = new Uint8Array(privateKeyArray);
 const keypair = Ed25519Keypair.fromSecretKey(privateKeyBytes);
-
 
 
 
@@ -31,6 +30,7 @@ const kioskClient = new KioskClient({
     network: Network.TESTNET,
 });
 
+const { kioskOwnerCaps } = await kioskClient.getOwnedKiosks({ address: keypair.getPublicKey().toSuiAddress()});
 
 
 
@@ -43,22 +43,37 @@ const kioskClient = new KioskClient({
         
         // create Transaction Block
         const txb = new TransactionBlock();
-
-
-
         
-        const address = `${walletThreeRef}`;
+
+
+        // create Kiosk TxBlock
+        const kioskTx = new KioskTransaction({ kioskClient, transactionBlock: txb,  cap: kioskOwnerCaps[0] });
 
 
 
-        const { kioskOwnerCaps, kioskIds } = await kioskClient.getOwnedKiosks({ address });
-
-        console.log(`kiosk owner cap: ${kioskOwnerCaps}, and kioskIds: ${kioskIds}`);
-         
+        txb.setGasBudget(10000000);
+        
     
-
+        kioskTx.list({
+            itemType: `${ITEMTYPE}`,
+            itemId: `${PREDICTION_TWO}`,
+            price: 10000000
+        });
 
         
+
+        
+        console.log(`prediction listed in kiosk`);
+        
+
+        kioskTx.shareAndTransferCap(keypair.getPublicKey().toRawBytes());
+
+
+        // finalize the kiosk transaction
+        kioskTx.finalize();
+        
+        
+
         // finalize the transaction block
         let txid = await client.signAndExecuteTransactionBlock({
             signer: keypair,

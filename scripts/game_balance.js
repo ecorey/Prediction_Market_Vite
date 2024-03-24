@@ -1,15 +1,15 @@
 import { getFullnodeUrl, SuiClient, SuiHTTPTransport  } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import walletDev from '../dev-wallet.json' assert { type: 'json' };
+import walletDev from './dev-wallet.json' assert { type: 'json' };
 
 import { WebSocket } from 'ws';
 
-import {  PACKAGE, CLOCK  } from '../config.js';
+import {  PACKAGE, GAME_ID  } from './config.js';
 
 
 // ###################################
-// ############GET CURRENT TIME#######
+// ############GET GAME BALANCE#######
 // ###################################
 
 
@@ -44,16 +44,20 @@ const client = new SuiClient({
 
 
 
-        async function logCurrentTime() {
-            await txb.moveCall({
-                target: `${PACKAGE}::kiosk_practice::get_time`,
-                arguments: [txb.object(CLOCK)],
+        txb.setGasBudget(10000000);
+
+
+        async function logGameBalance() {
+            
+             await txb.moveCall({
+                target: `${PACKAGE}::predictrix::balance`,
+                arguments: [ txb.object(GAME_ID) ],
             });
            
         }
 
-        await logCurrentTime();
-        
+
+        await logGameBalance();
         
 
 
@@ -66,7 +70,7 @@ const client = new SuiClient({
         
 
 
-        // // log the transaction result
+        // log the transaction result
         console.log(`Transaction result: ${JSON.stringify(txid, null, 2)}`);
         console.log(`success: https://suiexplorer.com/txblock/${txid.digest}?network=testnet`);
 
