@@ -41,11 +41,11 @@ const CreateKioskPlacePrediction = () => {
 
   const { connected, account, signAndExecuteTransactionBlock } = useWallet();
 
-  useEffect(() => {
-    if (connected) {
-      console.log(account?.address);
-    }
-  }, [connected, account]);
+  // useEffect(() => {
+  //   if (connected) {
+  //     console.log(account?.address);
+  //   }
+  // }, [connected, account]);
 
 
 
@@ -84,15 +84,12 @@ const CreateKioskPlacePrediction = () => {
     //   })
     //   .finalize();
   
-    // how to get the wallet pub key
-    kioskTx.shareAndTransferCap("0x4a75b7e9852292171621404a75ea7ffe87faf231fc3b9778f9e9de75f8e618f3");
-
-
-
     
 
-
-
+    if (account) {
+      kioskTx.shareAndTransferCap(account.address);
+      console.log(`Kiosk created and Kiosk cap sent to ${account.address} !`);
+    }
 
     // Sign and execute transaction block.
     await signAndExecuteTransactionBlock({ transactionBlock: txb });
