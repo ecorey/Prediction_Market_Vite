@@ -5,9 +5,8 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { useWallet } from '@suiet/wallet-kit';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { PACKAGE, CLOCK, GAME_ID } from '../../scripts/config.ts';
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-
+import { PACKAGE, CLOCK, GAME_ID } from '../../scripts/config';
 
 const theme = createTheme({
   typography: {
@@ -17,10 +16,10 @@ const theme = createTheme({
 
 const textFieldStyle = {
   input: {
-    color: "white", 
-    fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif", 
-    backgroundColor: "rgba(0, 0, 0, 0.5)", 
-    borderRadius: "4px", 
+    color: "white",
+    fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    borderRadius: "4px",
   },
   notchedOutline: {
     borderWidth: "1px",
@@ -33,16 +32,21 @@ const MakePrediction = () => {
   const [republican, setRepublican] = useState('');
   const [democrat, setDemocrat] = useState('');
 
-  const handleRepublicanChange = (value: string) => {
-    setRepublican(value);
-    const numValue = Math.max(parseInt(value, 10) || 0, 0);
-    setDemocrat(`${538 - numValue}`);
+  const ensurePositiveInteger = (value: string) => {
+    const parsed = parseInt(value, 10);
+    return isNaN(parsed) || parsed < 0 ? 0 : parsed;
   };
 
-  const handleDemocratChange = (value: string): void => {
-    setDemocrat(value);
-    const numValue: number = Math.max(parseInt(value, 10) || 0, 0);
-    setRepublican(`${538 - numValue}`);
+  const handleRepublicanChange = (value: string) => {
+    const numValue = ensurePositiveInteger(value);
+    setRepublican(value); 
+    setDemocrat(`${538 - numValue}`); 
+  };
+
+  const handleDemocratChange = (value: string) => {
+    const numValue = ensurePositiveInteger(value);
+    setDemocrat(value); 
+    setRepublican(`${538 - numValue}`); 
   };
 
   const handlePrediction = async () => {
@@ -51,8 +55,10 @@ const MakePrediction = () => {
       return;
     }
 
-    const republicanValue = parseInt(republican, 10) || 0;
-    const democratValue = parseInt(democrat, 10) || 0;
+    const republicanValue = ensurePositiveInteger(republican);
+    const democratValue = ensurePositiveInteger(democrat);
+
+    // Ensure the total equals 538
     if (republicanValue + democratValue !== 538) {
       alert("The total should be 538.");
       return;
@@ -61,10 +67,15 @@ const MakePrediction = () => {
     const txb = new TransactionBlock();
 
     txb.setGasBudget(10000000);
+
     const [coin] = txb.splitCoins(txb.gas, [txb.pure(1000000)]);
+
+
     txb.moveCall({
-      target: `${PACKAGE}::kiosk_practice::make_prediction`,
+
+      target: `${PACKAGE}::predictrix::make_prediction`,
       arguments: [txb.pure.u64(republicanValue), coin, txb.object(GAME_ID), txb.object(CLOCK)],
+
     });
 
     try {
@@ -80,7 +91,7 @@ const MakePrediction = () => {
   };
 
   if (!connected) {
-    return null; 
+    return null;
   }
 
   return (
@@ -101,62 +112,64 @@ const MakePrediction = () => {
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, pb: 2 }}>
         <TextField
-        id="input-republican"
-        variant="outlined"
-        placeholder="REPUBLICANS"
-        value={republican}
-        onChange={(e) => handleRepublicanChange(e.target.value)}
-        InputProps={{
-          style: textFieldStyle.input,
-        }}
-        InputLabelProps={{ style: { color: 'white' } }}
-        
-        sx={{
-          '& .MuiOutlinedInput-root': {
-            '& fieldset': {
-              borderColor: 'white', 
-            },
-            '&:hover fieldset': {
-              borderColor: 'white', 
-            },
-            '&.Mui-focused fieldset': {
-              borderColor: 'white', 
-            },
-          }
-        }}
-      />
+          id="input-republican"
+          variant="outlined"
+          placeholder="REPUBLICANS"
+          value={republican}
+          onChange={(e) => handleRepublicanChange(e.target.value)}
+          InputProps={{
+            style: textFieldStyle.input,
+          }}
+          InputLabelProps={{ style: { color: 'white' } }}
+          // Directly apply styles to ensure the white outline is visible
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: 'white', // Default state
+              },
+              '&:hover fieldset': {
+                borderColor: 'white', // Hover state
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: 'white', // Focused state
+              },
+            }
+          }} />
 
-      <TextField
-        id="input-democrat"
-        variant="outlined"
-        placeholder="DEMOCRATS"
-        value={democrat}
-        onChange={(e) => handleDemocratChange(e.target.value)}
-        InputProps={{
-          style: textFieldStyle.input,
-          classes: {
-          },
-        }}
-        InputLabelProps={{ style: { color: 'white' } }}
-        sx={{
-          '& .MuiOutlinedInput-root': {
-            '& fieldset': {
-              borderColor: 'white', 
-            },
-            '&:hover fieldset': {
-              borderColor: 'white', 
-            },
-            '&.Mui-focused fieldset': {
-              borderColor: 'white', 
-            },
-          }
-        }}
-      />
-          <Button variant="outlined" onClick={handlePrediction} sx={{ color: 'white', borderColor: 'white' }}>Make Prediction</Button>
+          <Typography variant="h6">/</Typography>
+          
+          <TextField
+            id="input-democrat"
+            variant="outlined"
+            placeholder="DEMOCRATS"
+            value={democrat}
+            onChange={(e) => handleDemocratChange(e.target.value)}
+            InputProps={{
+              style: textFieldStyle.input,
+            }}
+            InputLabelProps={{ style: { color: 'white' } }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: 'white', 
+                },
+                '&:hover fieldset': {
+                  borderColor: 'white', 
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: 'white', 
+                },
+              }
+            }} />
+
+            <Button variant="outlined" onClick={handlePrediction} sx={{ color: 'white', borderColor: 'white', '&:hover': { borderColor: 'white', backgroundColor: 'rgba(255, 255, 255, 0.1)' } }}>
+              Make Prediction
+            </Button>
+          </Box>
         </Box>
-      </Box>
-    </ThemeProvider>
-  );
-};
-
-export default MakePrediction;
+      </ThemeProvider>
+    );
+  };
+  
+  export default MakePrediction;
+  
