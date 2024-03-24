@@ -39,7 +39,7 @@ const theme = createTheme({
 
 const ClaimWinnings = () => {
   const { connected, signAndExecuteTransactionBlock } = useWallet();
-  const [userPredictionId, setUserPredictionId] = useState('');
+  const [userPredictionId, setUserPredictionId] = useState("");
 
 
 
@@ -51,15 +51,19 @@ const ClaimWinnings = () => {
     
     txb.setGasBudget(10000000);
     
+
+
     txb.moveCall({
       target: `${PACKAGE}::predictrix::claim_winner`,
       arguments: [txb.object(userPredictionId), txb.object(GAME_ID), txb.object(CLOCK)],
     });
 
+
     try {
       const result = await signAndExecuteTransactionBlock({
         transactionBlock: txb,
       });
+
 
       console.log('Winnings claimed successfully', result);
       alert('Your winnings have been successfully claimed!');
@@ -80,7 +84,7 @@ const ClaimWinnings = () => {
         placeholder="Prediction ID"
         value={userPredictionId}
         onChange={(e) => setUserPredictionId(e.target.value)}
-        disabled={!connected} // Disable the TextField if the wallet is not connected
+        disabled={!connected} 
         sx={{
           borderColor: 'white',
           color: 'white',
