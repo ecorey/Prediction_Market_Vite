@@ -47,16 +47,17 @@ const PlacePrediction = () => {
   const handleCreateAndPlace = async () => {
 
     if (!connected || !userPredictionId) {
-      alert("Please connect your wallet and enter a prediction ID.");
+        alert("Please connect your wallet and enter a prediction ID.");
     } 
 
     // create Transaction Block
     const txb = new TransactionBlock();
 
-      
+    const { kioskOwnerCaps } = await kioskClient.getOwnedKiosks({ address: account?.address ?? ''});
+        
     // ADD CAP AND FIELED TO ENTER CAP
     // create Kiosk TxBlock
-    const kioskTx = new KioskTransaction({ transactionBlock: txb, kioskClient });
+    const kioskTx = new KioskTransaction({ transactionBlock: txb, kioskClient,  cap: kioskOwnerCaps[0] });
 
 
     txb.setGasBudget(10000000);
@@ -120,6 +121,7 @@ const PlacePrediction = () => {
         <Typography variant="h4" gutterBottom>
           Place Prediction
         </Typography>
+        
         <TextField
           label="Prediction ID"
           placeholder="Enter your prediction ID" 
