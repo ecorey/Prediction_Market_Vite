@@ -54,7 +54,7 @@ export const CLOCK = "0x6";
 
 
 export const DEV_WALLET = "0x07095af51002db0e9be284b8dab97263f77fec2a1be68cd42b7dd2358a6eccdd";
-
+export const DEV_WALLET_SUIET = "0x4a75b7e9852292171621404a75ea7ffe87faf231fc3b9778f9e9de75f8e618f3";
 
 // created in init
 export const PACKAGE = "0xeee834a8c14dda5c0722cb99470cb9613ec9aad3ac343476c910933c7eb2952b";
@@ -107,10 +107,10 @@ export const GAME_RESULT = "223";
 
 
 // PREDCITION SCRIPT
-export const PREDICTION = "0xf2a6c426ae44abb525f5375fedc2d167f086af09268b41333f103623dd4f6545";
-export const PREDICTION_ID = "0xf2a6c426ae44abb525f5375fedc2d167f086af09268b41333f103623dd4f6545";
+export const PREDICTION = "0x6bbd396ac58cace9f2e50082ecb314b673f0055a9ad373ee869941a51678ab49";
+export const PREDICTION_ID = "0x6bbd396ac58cace9f2e50082ecb314b673f0055a9ad373ee869941a51678ab49";
 
-export const PREDICTION_TWO = "";
+export const PREDICTION_TWO = "0x6bbd396ac58cace9f2e50082ecb314b673f0055a9ad373ee869941a51678ab49";
 
 
 export const GUESS = 444;

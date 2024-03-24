@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -35,73 +35,85 @@ const kioskClient = new KioskClient({
   network: Network.TESTNET,
 });
 
+
+
 const CreateKioskPlacePrediction = () => {
-  const { connected, signAndExecuteTransactionBlock } = useWallet();
+
+  const { connected, account, signAndExecuteTransactionBlock } = useWallet();
+
+  useEffect(() => {
+    if (connected) {
+      console.log(account?.address);
+    }
+  }, [connected, account]);
+
+
+
+
+
   const [userPredictionId, setUserPredictionId] = useState('');
 
   const handleCreateAndPlace = async () => {
+
     if (!connected || !userPredictionId) {
       alert("Please connect your wallet and enter a prediction ID.");
+    } 
+
+    // create Transaction Block
+    const txb = new TransactionBlock();
       
 
-      // create Transaction Block
-      const txb = new TransactionBlock();
-        
-
-      // create Kiosk TxBlock
-      const kioskTx = new KioskTransaction({ transactionBlock: txb, kioskClient });
+    // create Kiosk TxBlock
+    const kioskTx = new KioskTransaction({ transactionBlock: txb, kioskClient });
 
 
-      // create a new kiosk public shared kiosk
-      kioskTx.create();
+    txb.setGasBudget(10000000);
 
 
-      kioskTx
-      .place({
-          itemType: `${ITEMTYPE}`,
-          item: `${userPredictionId}`,
-      });
+    // create a new kiosk public shared kiosk
+    kioskTx.create();
 
+    const item = userPredictionId;
+    const itemType = ITEMTYPE;
 
-
-      kioskTx.finalize();
-
-      
-
-      console.log(`Prediction placed in kiosk`);
-
+    
+    // kioskTx
+    //   .place({
+    //     item,
+    //     itemType,
+    //   })
+    //   .finalize();
   
-      
-      try {
-        const result = await signAndExecuteTransactionBlock({
-          transactionBlock: txb,
-        });
-  
-        console.log('Kiosk Created and Prediction Placed', result);
-        alert('Kiosk Created and Prediction Placed!');
-      } catch (error) {
-        console.error('Failed to create kiosk', error);
-        alert('Failed to create kiosk.');
-      }
-      
+    // how to get the wallet pub key
+    kioskTx.shareAndTransferCap("0x4a75b7e9852292171621404a75ea7ffe87faf231fc3b9778f9e9de75f8e618f3");
+
+
+
+    
 
 
 
 
-
-
-
-
-      return;
-    }
+    // Sign and execute transaction block.
+    await signAndExecuteTransactionBlock({ transactionBlock: txb });
 
    
 
-    alert("Prediction placed in kiosk.");
-    
+  
+
+
+
+
+   
+  
     
     setUserPredictionId('');
+
+
+
   };
+
+
 
   return (
     <ThemeProvider theme={theme}>
@@ -116,6 +128,7 @@ const CreateKioskPlacePrediction = () => {
         m: 1,
         width: '100%',
       }}>
+
         <Typography variant="h4" gutterBottom>
           Create Kiosk & Place Prediction
         </Typography>
