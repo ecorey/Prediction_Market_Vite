@@ -24,24 +24,13 @@ const theme = createTheme({
   typography: {
     fontFamily: 'PixelSans, Arial, sans-serif',
   },
-  // palette: {
-  //   mode: 'dark', 
-  //   background: {
-  //     default: '#000000', 
-  //   },
-  // },
-  components: {
-    MuiCssBaseline: {
-      styleOverrides: {
-        body: {
-          background: '#000000',
-          backgroundImage: "url(https://i.imgur.com/m8KuaOS.gif)",
-          backgroundSize: 'auto',
-          backgroundRepeat: 'repeat',
-        }
-      }
-    }
-  }
+  palette: {
+    mode: 'dark', 
+    background: {
+      default: '#000000', 
+    },
+  },
+  
 });
 
 

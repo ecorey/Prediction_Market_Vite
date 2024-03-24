@@ -27,17 +27,13 @@ const textFieldStyle = {
   },
 };
 
+
 const MakePrediction = () => {
   const { connected, signAndExecuteTransactionBlock } = useWallet();
   const [republican, setRepublican] = useState('');
   const [democrat, setDemocrat] = useState('');
 
-  const ensurePositiveInteger = (value: string) => {
-    const parsed = parseInt(value, 10);
-    return isNaN(parsed) || parsed < 0 ? 0 : parsed;
-    
-  };
-
+  
 
   // Ensure value is a positive integer or fallback to 0
   const toUint = (value: string): number => {
@@ -46,13 +42,7 @@ const MakePrediction = () => {
   };
 
 
-  // input boxes will always be A + B = 538
-  const handleInput = (setValueOther: React.Dispatch<React.SetStateAction<string>>, value: string) => {
-    const numValue = toUint(value);
-    setValueOther((538 - numValue).toString());
-  };
-
-
+  
   const handleRepublicanChange = (value: string) => {
     const numValue = Math.max(parseInt(value, 10) || 0, 0);
     setRepublican(value);
@@ -83,7 +73,7 @@ const MakePrediction = () => {
       txb.setGasBudget(10000000);
 
 
-        const [coin] = txb.splitCoins(txb.gas, [txb.pure(1000000)]);
+      const [coin] = txb.splitCoins(txb.gas, [txb.pure(1000000)]);
 
 
       
@@ -106,12 +96,6 @@ const MakePrediction = () => {
     }
   };
 
-
-
-
-  if (!connected) {
-    return null;
-  }
 
 
 
@@ -146,13 +130,13 @@ const MakePrediction = () => {
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': {
-                    borderColor: 'white', // Default state
+                    borderColor: 'white', 
                   },
                   '&:hover fieldset': {
-                    borderColor: 'white', // Hover state
+                    borderColor: 'white', 
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: 'white', // Focused state
+                    borderColor: 'white', 
                   },
                 }
               }}
@@ -171,13 +155,13 @@ const MakePrediction = () => {
             sx={{
               '& .MuiOutlinedInput-root': {
                 '& fieldset': {
-                  borderColor: 'white', // Default state
+                  borderColor: 'white', 
                 },
                 '&:hover fieldset': {
-                  borderColor: 'white', // Hover state
+                  borderColor: 'white', 
                 },
                 '&.Mui-focused fieldset': {
-                  borderColor: 'white', // Focused state
+                  borderColor: 'white', 
                 },
               }
             }}

@@ -52,7 +52,7 @@ const ClaimWinnings = () => {
     txb.setGasBudget(10000000);
     
     txb.moveCall({
-      target: `${PACKAGE}::kiosk_practice::claim_winner`,
+      target: `${PACKAGE}::predictrix::claim_winner`,
       arguments: [txb.object(userPredictionId), txb.object(GAME_ID), txb.object(CLOCK)],
     });
 

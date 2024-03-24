@@ -360,7 +360,7 @@ module predictrix::predictrix {
 
 
 
-    public fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) : PredictEpoch  {
+    public fun set_predict_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext)   {
         
         let predict_epoch  = PredictEpoch {
             id: object::new(ctx),
@@ -368,14 +368,14 @@ module predictrix::predictrix {
             end_time,
         };
 
-        predict_epoch
+        transfer::transfer(predict_epoch, tx_context::sender(ctx));
 
     }
 
 
 
 
-    public fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) : ReportEpoch {
+    public fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) {
         
         let report_epoch  = ReportEpoch {
             id: object::new(ctx),
@@ -383,7 +383,7 @@ module predictrix::predictrix {
             end_time,
         };
 
-        report_epoch
+        transfer::transfer(report_epoch, tx_context::sender(ctx));
 
     }
     
