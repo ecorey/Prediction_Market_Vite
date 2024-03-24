@@ -54,15 +54,17 @@ export const CLOCK = "0x6";
 
 
 export const DEV_WALLET = "0x07095af51002db0e9be284b8dab97263f77fec2a1be68cd42b7dd2358a6eccdd";
+export const PACKAGE_PUBLISHER_WALLET = "0x07095af51002db0e9be284b8dab97263f77fec2a1be68cd42b7dd2358a6eccdd";
 
+export const DEV_WALLET_SUIET = "0x8765e12c4e37aa222a40986bb3d8b893d1c0b3483b617974954e9d860436506f";
 
 // created in init
-export const PACKAGE = "0xeee834a8c14dda5c0722cb99470cb9613ec9aad3ac343476c910933c7eb2952b";
-export const START_GAME_CAP = "0x714fffa412f7b3580682536671a7181b886c6071887082573cc010750a079310";
-export const END_GAME_CAP = "0x6975936e7df459647be317a085b6b244a7d247ed939cc82f58ddb4321f23a772";
-export const GAME_OWNER_CAP = "0x3fac1172066821fe6ea4a24f2fa307a5d4d0edba1103f696646744dc8aa5ebf8";
-export const TRANSFER_POLICY  = "";
-export const TRANSFER_POLICY_CAP = "0x3d12fd42c98fd5daaacf82fddee2ba55d36a3f68240d0191889e14257a3bd692";
+export const PACKAGE = "0x9a36f7ee14fad9b13fc08a17c4fa065ce874e58966cdd6265e543c58d871c72e";
+export const START_GAME_CAP = "0xfe80f53dd0886dd207c1e823ec4c9f16cf50d86289c9a15ed1e138a5852645f4";
+export const END_GAME_CAP = "0x4f9aa794a64ad41f05b9634dd94863ee7ab291a1323bce48aa4c6210fa68e05c";
+export const GAME_OWNER_CAP = "0xf419f470ec657c20e890fd23b4fac55b1314e143ce1116a028a9052c735016d8";
+export const TRANSFER_POLICY  = "0x485b68d0af79b270a8bee17627eebd0cd28fcb93bc80706736ba640e54b6d4ec";
+export const TRANSFER_POLICY_CAP = "0x650776b2faa01d902032e55fde9f23a800cee5825e36aee1cfffcf03c67b47c6";
 export const PUBLISHER = "";
 export const UPGRADE_CAP = "";
 export const ITEMTYPE = `${PACKAGE}::kiosk_practice::Prediction`;
@@ -71,32 +73,39 @@ export const ITEMTYPE = `${PACKAGE}::kiosk_practice::Prediction`;
 // START GAME SCRIPT
 export const GAME_PRICE = "1000000";
 
+
+// for demo testing quick reference
+// timestamp_ms plus 2 minutes is + 120,000 ms
+// 4 mins + 240,000 ms
+// 5 mins + 300,000 ms
+// 10 mins + 600,000 ms
+// 1 hour + 3,600,000 ms
 // (election event on Nov. 5)
 // get from get time event log
-export const PREDICT_START_TIME = 1711147963913;
+export const PREDICT_START_TIME = 1711299758038;
 
 // November 3, 2024, at 12:00 AM (GMT)
-export const PREDICT_END_TIME = 1730592000000;
+export const PREDICT_END_TIME = 1711300058038;
 
 // November 10, 2024 at 12:00 AM (GMT)
-export const REPORT_START_TIME = 1731196800000;
+export const REPORT_START_TIME = 1711300058038;
 
 // February 2, 2024, at 12:00 AM (GMT)
-export const REPORT_END_TIME = 1706832000000;
+export const REPORT_END_TIME = 1711302958346;
 
 
+
+export const IS_GAME_OPEN = true;
 
 
 //CLOSE GAME SCRIPT
 // game id
-export const GAME_ID = "0x5e2842c1727d6430dbbe6496bdbe7f681f407ad9e96685ab18f6c63dc2d0bf3f";
-
-export const GAME_STATUS = false;
+export const GAME_ID = "";
 
 
 
 // ADD BALANCE TO GAME SCRIPT
-export const COIN_TO_ADD = "0x81e5534a23552d8e80250a62729a193df59dab977c033feda484493b859236f6";
+export const COIN_TO_ADD = "";
 
 
 
@@ -107,8 +116,8 @@ export const GAME_RESULT = "223";
 
 
 // PREDCITION SCRIPT
-export const PREDICTION = "0xf2a6c426ae44abb525f5375fedc2d167f086af09268b41333f103623dd4f6545";
-export const PREDICTION_ID = "0xf2a6c426ae44abb525f5375fedc2d167f086af09268b41333f103623dd4f6545";
+export const PREDICTION = "";
+export const PREDICTION_ID = "";
 
 export const PREDICTION_TWO = "";
 

@@ -43,6 +43,9 @@ const PlacePrediction = () => {
 
 
   const [userPredictionId, setUserPredictionId] = useState('');
+  const [kioskId, setkioskID] = useState('');
+  const [kioskOwnerCapId, setOwnerCapId] = useState('');
+
 
   const handleCreateAndPlace = async () => {
 
@@ -50,53 +53,56 @@ const PlacePrediction = () => {
         alert("Please connect your wallet and enter a prediction ID.");
     } 
 
-    // create Transaction Block
-    const txb = new TransactionBlock();
-
-    const { kioskOwnerCaps } = await kioskClient.getOwnedKiosks({ address: account?.address ?? ''});
-        
-    // ADD CAP AND FIELED TO ENTER CAP
-    // create Kiosk TxBlock
-    const kioskTx = new KioskTransaction({ transactionBlock: txb, kioskClient,  cap: kioskOwnerCaps[0] });
-
-
-    txb.setGasBudget(10000000);
-
-
-    
-
-    const item = "0xf96bd5e7049d1cee509984917a4ff081998131a42ab3fa93b035a760619d8dd6";
-    const itemType = "0xeee834a8c14dda5c0722cb99470cb9613ec9aad3ac343476c910933c7eb2952b::kiosk_practice::Prediction";
-
-    
-    try {
-      await kioskTx.place({
-        item,
-        itemType,
-      });
-      console.log("Place method succeeded");
-    } catch (error) {
-      console.error("Error in place method:", error);
-    }
-  
-    
-
-    if (account) {
-      console.log(`Prediction placed in kiosk owned by ${account.address}`);
-      kioskTx.finalize();
-    }
-
-
-
-    // Sign and execute transaction block.
-    await signAndExecuteTransactionBlock({ transactionBlock: txb });
-
    
 
 
+    console.log(`account: ${account?.address ?? ''}`);
+    
+
+    
+
+    try {
+       
+  
+        const txb = new TransactionBlock();
+        
+        
+        txb.setGasBudget(10000000);
+        
+
+        txb.moveCall({
+            target: `${PACKAGE}::predictrix::place_item`,
+            arguments: [
+                txb.object(kioskOwnerCapId),
+                txb.object(kioskId),
+                txb.object(userPredictionId),
+            ],
+            typeArguments: [`${PACKAGE}::predictrix::Prediction`]
+        });
+
+
+  
+        console.log("Prediction placed successfully.");
+
+
+        // Sign and execute transaction block.
+        await signAndExecuteTransactionBlock({ transactionBlock: txb });
+
+        console.log(account?.address)
+        
+        
+      } catch (error) {
+        console.error("Error in placing prediction:", error);
+      }
+
+
+
+
     setUserPredictionId('');
+    setkioskID('');
+    setOwnerCapId('');
 
-
+    
 
   };
 
@@ -116,11 +122,67 @@ const PlacePrediction = () => {
         borderRadius: '4px',
         m: 1,
         width: '100%',
+        color: 'white',
       }}>
 
-        <Typography variant="h4" gutterBottom>
-          Place Prediction
+        <Typography variant="h4" gutterBottom >
+          Place Prediction in Your Kiosk
         </Typography>
+        <TextField
+          label="Kiosk ID"
+          placeholder="Enter your prediction ID" 
+          variant="outlined"
+          value={userPredictionId}
+          onChange={(e) => setkioskID(e.target.value)}
+          sx={{
+            mb: 2,
+            width: '100%',
+            "& .MuiOutlinedInput-root": {
+              
+              "& fieldset": {
+                
+                borderColor: "white", 
+              },
+              "&:hover fieldset": {
+                borderColor: "lightblue", 
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "lightblue", 
+              },
+            },
+            "& .MuiInputBase-input": {
+              color: "white", 
+            },
+          }}
+        />
+
+         <TextField
+          label=" Kiosk OwnerCap ID"
+          placeholder="Enter your prediction ID" 
+          variant="outlined"
+          value={userPredictionId}
+          onChange={(e) => setOwnerCapId(e.target.value)}
+          sx={{
+            mb: 2,
+            width: '100%',
+            "& .MuiOutlinedInput-root": {
+              
+              "& fieldset": {
+                
+                borderColor: "white", 
+              },
+              "&:hover fieldset": {
+                borderColor: "lightblue", 
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "lightblue", 
+              },
+            },
+            "& .MuiInputBase-input": {
+              color: "white", 
+            },
+          }}
+        />
         
         <TextField
           label="Prediction ID"
@@ -162,3 +224,4 @@ const PlacePrediction = () => {
 };
 
 export default PlacePrediction;
+

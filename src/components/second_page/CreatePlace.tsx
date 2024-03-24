@@ -34,7 +34,7 @@ const kioskClient = new KioskClient({
 
 
 
-const CreateKiosk = () => {
+const CreatePlaceKiosk = () => {
 
   const { connected, account, signAndExecuteTransactionBlock } = useWallet();
 
@@ -60,18 +60,17 @@ const CreateKiosk = () => {
 
 
     // create a new kiosk public shared kiosk
-    kioskTx.create();
+    kioskTx
+    .createPersonal(true) 
+    .place({
+        itemType: '0xeee834a8c14dda5c0722cb99470cb9613ec9aad3ac343476c910933c7eb2952b::kiosk_practice::Prediction',
+        item: '0x950601fc797212a670e15d4ba17bc7a9e94f89029e75fd6e2d56d81203ce50c1',
+    })
+    .finalize();
 
     
     
     
-
-    if (account) {
-      kioskTx.shareAndTransferCap(account.address);
-      console.log(`Kiosk created and Kiosk cap sent to ${account.address} !`);
-      kioskTx.finalize();
-    }
-
 
 
     // Sign and execute transaction block.
@@ -106,7 +105,7 @@ const CreateKiosk = () => {
       }}>
 
         <Typography variant="h4" gutterBottom>
-          Create Kiosk 
+          Create Place Kiosk 
         </Typography>
         
         <Button
@@ -114,11 +113,11 @@ const CreateKiosk = () => {
           onClick={handleCreateAndPlace}
           disabled={!connected}
         >
-           Create Kiosk
+           Create Place Kiosk
         </Button>
       </Box>
     </ThemeProvider>
   );
 };
 
-export default CreateKiosk;
+export default CreatePlaceKiosk;

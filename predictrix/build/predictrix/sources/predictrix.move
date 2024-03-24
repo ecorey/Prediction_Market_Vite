@@ -670,8 +670,16 @@ module predictrix::predictrix {
 
 
 
-    // done in ptb
-    // place, take, list, delist, purchase 
+    public fun place_item<Prediction: key + store>(cap:&KioskOwnerCap, kiosk: &mut Kiosk, prediction: Prediction){
+        kiosk::place(kiosk, cap, prediction);
+    }
+
+
+
+
+    public fun list_item<Prediction: key + store>(cap: &KioskOwnerCap, kiosk: &mut Kiosk, prediction_id: ID, price: u64){
+        kiosk::list<Prediction>(kiosk, cap, prediction_id, price);
+    }
     
 
 

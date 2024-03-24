@@ -1,5 +1,5 @@
 import './App.css';
-import { Container, Grid, Box } from '@mui/material';
+import { Container, Grid, Box, GlobalStyles } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import Genie from "./components/Genie";
@@ -18,17 +18,36 @@ import * as React from 'react';
 
 
 
+
+
 const theme = createTheme({
   typography: {
     fontFamily: 'PixelSans, Arial, sans-serif',
   },
-  palette: {
-    mode: 'dark', 
-    background: {
-      default: '#000000', 
-    },
-  },
+  // palette: {
+  //   mode: 'dark', 
+  //   background: {
+  //     default: '#000000', 
+  //   },
+  // },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          background: '#000000',
+          backgroundImage: "url(https://i.imgur.com/m8KuaOS.gif)",
+          backgroundSize: 'auto',
+          backgroundRepeat: 'repeat',
+        }
+      }
+    }
+  }
 });
+
+
+
+
+
 
 function App() {
   return (
@@ -36,6 +55,7 @@ function App() {
       <div className="App">
         <ThemeProvider theme={theme}>
           <CssBaseline />
+          
           <NavBar />
           <Routes>
             <Route path="/" element={
@@ -57,7 +77,7 @@ function App() {
   );
 }
 
-// Helper component to avoid repeating layout code
+
 function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <Box sx={{ flexGrow: 1, padding: '0 16px' }}> 

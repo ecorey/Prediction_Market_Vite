@@ -1,6 +1,7 @@
 import { Container, Grid, Box } from '@mui/material';
 import AboutKiosk from "./AboutKiosk";
-import CreateKiosk from "./CreateKiosk";
+import CreateSharedKiosk from "./CreateSharedKiosk";
+import CreatePlace from "./CreatePlace";
 import PlacePrediction from "./PlacePrediction";
 import TakeFromKiosk from "./TakeFromKiosk";
 import ListPrediction from "./ListPrediction";
@@ -33,7 +34,7 @@ function SecondPage() {
 
                 {connected && (
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <CreateKiosk /> 
+                    <CreateSharedKiosk /> 
                     </Grid>
                 )}
 
@@ -43,11 +44,17 @@ function SecondPage() {
                     </Grid>
                 )}
 
-                {connected && (
+                {/* {connected && (
+                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <CreatePlace /> 
+                    </Grid>
+                )} */}
+
+                {/* {connected && (
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
                     <TakeFromKiosk /> 
                     </Grid>
-                )}
+                )} */}
 
                 {connected && (
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
@@ -55,11 +62,11 @@ function SecondPage() {
                     </Grid>
                 )}
 
-                {connected && (
+                {/* {connected && (
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
                     <DeListPrediction /> 
                     </Grid>
-                )}
+                )} */}
 
                 {connected && (
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
