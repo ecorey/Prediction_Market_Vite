@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -8,7 +8,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { TransactionBlock} from '@mysten/sui.js/transactions';
 import { KioskClient, Network, KioskTransaction } from '@mysten/kiosk';
 import { PACKAGE, CLOCK, GAME_ID } from '../../../scripts/config.ts';
-import { ITEMTYPE } from '../../../scripts/config.js'; 
+import { ITEMTYPE, PREDICTION_TWO } from '../../../scripts/config.js'; 
 import { getFullnodeUrl, SuiClient, SuiHTTPTransport } from "@mysten/sui.js/client";
 
 
@@ -20,86 +20,80 @@ const theme = createTheme({
 });
 
 
-// client
-const client = new SuiClient({
-  transport: new SuiHTTPTransport({
-      url: getFullnodeUrl('testnet'),
-  }),
-});
 
 
+const WithdrawFromKiosk = () => {
 
-// kiosk client
-const kioskClient = new KioskClient({
-  client, 
-  network: Network.TESTNET,
-});
+  const { connected, account, signAndExecuteTransactionBlock } = useWallet();
 
-const Withdraw = () => {
-  const { connected, signAndExecuteTransactionBlock } = useWallet();
+
   const [userPredictionId, setUserPredictionId] = useState('');
-  const [kioskId, setKioskId] = useState(''); 
-  const [capId, setCapId] = useState('');
+  const [kioskId, setkioskID] = useState('');
+  const [kioskOwnerCapId, setOwnerCapId] = useState('');
 
-  const handle = async () => {
+
+  const handleCreateAndPlace = async () => {
+
     if (!connected || !userPredictionId) {
-      alert("Please connect your wallet and enter a prediction ID.");
-      
-
-      // create Transaction Block
-      const txb = new TransactionBlock();
-        
-
-      // create Kiosk TxBlock
-      const kioskTx = new KioskTransaction({ transactionBlock: txb, kioskClient });
-
-
-      // create a new kiosk public shared kiosk
-        kioskTx.create();
-
-
-        
-
-        kioskTx.finalize();
-
-      
-
-      console.log(`Prediction taken from kiosk`);
-
-  
-      
-      try {
-        const result = await signAndExecuteTransactionBlock({
-          transactionBlock: txb,
-        });
-  
-        console.log('Prediction Taken', result);
-        alert('Prediciton Taken!');
-      } catch (error) {
-        console.error('Failed to take prediction', error);
-        alert('Failed to take prediciton');
-      }
-      
-
-
-
-
-
-
-
-
-      return;
-    }
+        alert("Please connect your wallet and enter a prediction ID.");
+    } 
 
    
 
-    alert("Prediction Taken from kiosk.");
+
+    console.log(`account: ${account?.address ?? ''}`);
     
+
     
+
+    try {
+       
+  
+        const txb = new TransactionBlock();
+        
+        
+        txb.setGasBudget(10000000);
+        
+
+        txb.moveCall({
+            target: `${PACKAGE}::predictrix::place_item`,
+            arguments: [
+                txb.object(kioskOwnerCapId),
+                txb.object(kioskId),
+                txb.object(userPredictionId),
+            ],
+            typeArguments: [`${PACKAGE}::predictrix::Prediction`]
+        });
+
+
+  
+        console.log("Prediction placed successfully.");
+
+
+        // Sign and execute transaction block.
+        await signAndExecuteTransactionBlock({ transactionBlock: txb });
+
+        console.log(account?.address)
+        
+        
+      } catch (error) {
+        console.error("Error in placing prediction:", error);
+      }
+
+
+
+
     setUserPredictionId('');
-    setKioskId('');
-    setCapId('');
+    setkioskID('');
+    setOwnerCapId('');
+
+    
+
   };
+
+
+
+
 
   return (
     <ThemeProvider theme={theme}>
@@ -113,11 +107,64 @@ const Withdraw = () => {
         borderRadius: '4px',
         m: 1,
         width: '100%',
-        color: 'red',
+        color: 'blue',
       }}>
-        <Typography variant="h4" gutterBottom>
-         Withdraw
+
+        <Typography variant="h4" gutterBottom >
+          Withdraw Prediction from Your Kiosk
         </Typography>
+        <TextField
+            label="Owner Cap ID"
+            placeholder="Enter your Kiosk Owner Cap ID" 
+            variant="outlined"
+            value={kioskOwnerCapId}
+            onChange={(e) => setOwnerCapId(e.target.value)}
+            sx={{
+              mb: 2,
+              width: '100%',
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "white", 
+                },
+                "&:hover fieldset": {
+                  borderColor: "lightblue", 
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "lightblue", 
+                },
+              },
+              "& .MuiInputBase-input": {
+                color: "white", 
+              },
+            }}
+          />
+
+         <TextField
+          label="Kiosk ID"
+          placeholder="Enter your Kiosk ID" 
+          variant="outlined"
+          value={kioskId}
+          onChange={(e) => setkioskID(e.target.value)}
+          sx={{
+            mb: 2,
+            width: '100%',
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "white", 
+              },
+              "&:hover fieldset": {
+                borderColor: "lightblue", 
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "lightblue", 
+              },
+            },
+            "& .MuiInputBase-input": {
+              color: "white", 
+            },
+          }}
+        />
+
         <TextField
           label="Prediction ID"
           placeholder="Enter your prediction ID" 
@@ -128,63 +175,7 @@ const Withdraw = () => {
             mb: 2,
             width: '100%',
             "& .MuiOutlinedInput-root": {
-              
               "& fieldset": {
-                
-                borderColor: "white", 
-              },
-              "&:hover fieldset": {
-                borderColor: "lightblue", 
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "lightblue", 
-              },
-            },
-            "& .MuiInputBase-input": {
-              color: "white", 
-            },
-          }}
-        />
-        <TextField
-          label="Kiosk ID"
-          placeholder="Enter your Kiosk ID" 
-          variant="outlined"
-          value={userPredictionId}
-          onChange={(e) => setKioskId(e.target.value)}
-          sx={{
-            mb: 2,
-            width: '100%',
-            "& .MuiOutlinedInput-root": {
-              
-              "& fieldset": {
-                
-                borderColor: "white", 
-              },
-              "&:hover fieldset": {
-                borderColor: "lightblue", 
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "lightblue", 
-              },
-            },
-            "& .MuiInputBase-input": {
-              color: "white", 
-            },
-          }}
-        />
-        <TextField
-          label="Kiosk Cap ID"
-          placeholder="Enter your Kiosk Cap ID" 
-          variant="outlined"
-          value={userPredictionId}
-          onChange={(e) => setCapId(e.target.value)}
-          sx={{
-            mb: 2,
-            width: '100%',
-            "& .MuiOutlinedInput-root": {
-              
-              "& fieldset": {
-                
                 borderColor: "white", 
               },
               "&:hover fieldset": {
@@ -201,14 +192,15 @@ const Withdraw = () => {
         />
         <Button
           variant="contained"
-          onClick={handle}
+          onClick={handleCreateAndPlace}
           disabled={!connected}
         >
-          Withdraw
+          Withdraw Prediction
         </Button>
       </Box>
     </ThemeProvider>
   );
 };
 
-export default Withdraw;
+export default WithdrawFromKiosk;
+

@@ -10,7 +10,7 @@ export const CLOCK = "0x6";
 export const DEV_WALLET = "";
 export const PACKAGE_PUBLISHER_WALLET = "";
 
-export const DEV_WALLET_SUIET = "";
+export const WALLET_SUIET = "0x8765e12c4e37aa222a40986bb3d8b893d1c0b3483b617974954e9d860436506f";
 
 // created in init
 export const PACKAGE = "0x1b5ae8038ba36cc296c6185f6f92edbea678310066d4cf0e96979bdf54fba6ab";
@@ -73,8 +73,8 @@ export const GAME_RESULT = "444";
 
 
 // PREDCITION SCRIPT MADE BY USER ***
-export const PREDICTION = "0x37158230f3928e2c91c6b6c03934507d795231d12f5dc11595203e0937a66273";
-export const PREDICTION_ID = "0x37158230f3928e2c91c6b6c03934507d795231d12f5dc11595203e0937a66273";
+export const PREDICTION = "0xa216f250d1616f2e7b4e66ec81b5583b9e24fbc8c9315a45ac049578f6d8c4fb";
+export const PREDICTION_ID = "0xa216f250d1616f2e7b4e66ec81b5583b9e24fbc8c9315a45ac049578f6d8c4fb";
 
 export const PREDICTION_TWO = "";
 
@@ -84,8 +84,8 @@ export const GUESS = 444;
 
 
 // KIOSK SCRIPT
-export const KIOSK = "";
-export const KIOSK_OWNER_CAP = "";
+export const KIOSK = "0x0c8c105417548e2384006e89189bd50e6bf0bfa748b862209fb9552dab927080";
+export const KIOSK_OWNER_CAP = "0xfcfb9f1b88cfc999b0b5eaf6e46d3db1eadcbb47557603ef112e5e50dc20d580";
 
 
 

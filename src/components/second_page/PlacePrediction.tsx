@@ -20,21 +20,6 @@ const theme = createTheme({
 });
 
 
-// client
-const client = new SuiClient({
-  transport: new SuiHTTPTransport({
-      url: getFullnodeUrl('testnet'),
-  }),
-});
-
-
-
-// kiosk client
-const kioskClient = new KioskClient({
-  client, 
-  network: Network.TESTNET,
-});
-
 
 
 const PlacePrediction = () => {
@@ -129,18 +114,42 @@ const PlacePrediction = () => {
           Place Prediction in Your Kiosk
         </Typography>
         <TextField
+            label="Owner Cap ID"
+            placeholder="Enter your Kiosk Owner Cap ID" 
+            variant="outlined"
+            value={kioskOwnerCapId}
+            onChange={(e) => setOwnerCapId(e.target.value)}
+            sx={{
+              mb: 2,
+              width: '100%',
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "white", 
+                },
+                "&:hover fieldset": {
+                  borderColor: "lightblue", 
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "lightblue", 
+                },
+              },
+              "& .MuiInputBase-input": {
+                color: "white", 
+              },
+            }}
+          />
+
+         <TextField
           label="Kiosk ID"
-          placeholder="Enter your prediction ID" 
+          placeholder="Enter your Kiosk ID" 
           variant="outlined"
-          value={userPredictionId}
+          value={kioskId}
           onChange={(e) => setkioskID(e.target.value)}
           sx={{
             mb: 2,
             width: '100%',
             "& .MuiOutlinedInput-root": {
-              
               "& fieldset": {
-                
                 borderColor: "white", 
               },
               "&:hover fieldset": {
@@ -156,34 +165,6 @@ const PlacePrediction = () => {
           }}
         />
 
-         <TextField
-          label=" Kiosk OwnerCap ID"
-          placeholder="Enter your prediction ID" 
-          variant="outlined"
-          value={userPredictionId}
-          onChange={(e) => setOwnerCapId(e.target.value)}
-          sx={{
-            mb: 2,
-            width: '100%',
-            "& .MuiOutlinedInput-root": {
-              
-              "& fieldset": {
-                
-                borderColor: "white", 
-              },
-              "&:hover fieldset": {
-                borderColor: "lightblue", 
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "lightblue", 
-              },
-            },
-            "& .MuiInputBase-input": {
-              color: "white", 
-            },
-          }}
-        />
-        
         <TextField
           label="Prediction ID"
           placeholder="Enter your prediction ID" 
@@ -194,9 +175,7 @@ const PlacePrediction = () => {
             mb: 2,
             width: '100%',
             "& .MuiOutlinedInput-root": {
-              
               "& fieldset": {
-                
                 borderColor: "white", 
               },
               "&:hover fieldset": {
