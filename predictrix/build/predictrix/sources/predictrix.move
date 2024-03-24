@@ -575,7 +575,6 @@ module predictrix::predictrix {
     }
 
 
-
     
     // ###################
     // WITHDRAW FUNCTIONS#
