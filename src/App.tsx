@@ -16,6 +16,9 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline'; 
 import * as React from 'react';
 
+import background from "./assets/stars.gif";
+
+
 
 
 
@@ -37,11 +40,18 @@ const theme = createTheme({
 
 
 
-
 function App() {
   return (
     <Router>
-      <div className="App">
+
+      <div className="App" style={{ 
+        backgroundImage: `url(${background})`, 
+        backgroundPosition: 'center', 
+        backgroundRepeat: 'repeat',
+        height: 'auto', 
+        
+      }}>
+
         <ThemeProvider theme={theme}>
           <CssBaseline />
           
