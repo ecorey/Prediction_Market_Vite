@@ -37,18 +37,9 @@ const kioskClient = new KioskClient({
 
 
 
-const CreateKioskPlacePrediction = () => {
+const PlacePrediction = () => {
 
   const { connected, account, signAndExecuteTransactionBlock } = useWallet();
-
-  // useEffect(() => {
-  //   if (connected) {
-  //     console.log(account?.address);
-  //   }
-  // }, [connected, account]);
-
-
-
 
 
   const [userPredictionId, setUserPredictionId] = useState('');
@@ -61,8 +52,9 @@ const CreateKioskPlacePrediction = () => {
 
     // create Transaction Block
     const txb = new TransactionBlock();
-      
 
+      
+    // ADD CAP AND FIELED TO ENTER CAP
     // create Kiosk TxBlock
     const kioskTx = new KioskTransaction({ transactionBlock: txb, kioskClient });
 
@@ -70,45 +62,44 @@ const CreateKioskPlacePrediction = () => {
     txb.setGasBudget(10000000);
 
 
-    // create a new kiosk public shared kiosk
-    kioskTx.create();
+    
 
-    const item = userPredictionId;
-    const itemType = ITEMTYPE;
+    const item = "0xf96bd5e7049d1cee509984917a4ff081998131a42ab3fa93b035a760619d8dd6";
+    const itemType = "0xeee834a8c14dda5c0722cb99470cb9613ec9aad3ac343476c910933c7eb2952b::kiosk_practice::Prediction";
 
     
-    // kioskTx
-    //   .place({
-    //     item,
-    //     itemType,
-    //   })
-    //   .finalize();
+    try {
+      await kioskTx.place({
+        item,
+        itemType,
+      });
+      console.log("Place method succeeded");
+    } catch (error) {
+      console.error("Error in place method:", error);
+    }
   
     
 
     if (account) {
-      kioskTx.shareAndTransferCap(account.address);
-      console.log(`Kiosk created and Kiosk cap sent to ${account.address} !`);
+      console.log(`Prediction placed in kiosk owned by ${account.address}`);
+      kioskTx.finalize();
     }
+
+
 
     // Sign and execute transaction block.
     await signAndExecuteTransactionBlock({ transactionBlock: txb });
 
    
 
-  
 
-
-
-
-   
-  
-    
     setUserPredictionId('');
 
 
 
   };
+
+
 
 
 
@@ -127,7 +118,7 @@ const CreateKioskPlacePrediction = () => {
       }}>
 
         <Typography variant="h4" gutterBottom>
-          Create Kiosk & Place Prediction
+          Place Prediction
         </Typography>
         <TextField
           label="Prediction ID"
@@ -168,4 +159,4 @@ const CreateKioskPlacePrediction = () => {
   );
 };
 
-export default CreateKioskPlacePrediction;
+export default PlacePrediction;

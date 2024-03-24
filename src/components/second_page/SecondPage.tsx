@@ -1,6 +1,7 @@
 import { Container, Grid, Box } from '@mui/material';
 import AboutKiosk from "./AboutKiosk";
-import CreateKioskPlacePrediction from "./CreateKioskPlacePrediction";
+import CreateKiosk from "./CreateKiosk";
+import PlacePrediction from "./PlacePrediction";
 import TakeFromKiosk from "./TakeFromKiosk";
 import ListPrediction from "./ListPrediction";
 import DeListPrediction from "./DeListPrediction";
@@ -30,9 +31,15 @@ function SecondPage() {
                 <AboutKiosk />
               </Grid>
 
-                 {connected && (
+                {connected && (
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <CreateKioskPlacePrediction /> 
+                    <CreateKiosk /> 
+                    </Grid>
+                )}
+
+                {connected && (
+                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <PlacePrediction /> 
                     </Grid>
                 )}
 
