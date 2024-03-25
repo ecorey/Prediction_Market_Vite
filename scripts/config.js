@@ -62,7 +62,7 @@ export const IS_GAME_OPEN = true;
 //CLOSE GAME SCRIPT
 // game id
 export const GAME_ID = "";
-
+export const GAME_STATUS = "CLOSED";
 
 
 // ADD BALANCE TO GAME SCRIPT
