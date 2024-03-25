@@ -57,7 +57,7 @@ export const IS_GAME_OPEN = true;
 
 //CLOSE GAME SCRIPT
 
-export const GAME_STATUS = "OPEN";
+export const GAME_STATUS = "CLOSED";
 // game id
 export const GAME_ID = "";
 

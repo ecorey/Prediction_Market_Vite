@@ -25,8 +25,9 @@ const AboutKiosk = () => {
        borderRadius: '4px', 
        m: 1, 
        width: '100%', 
+       
         }}>
-      <Typography className={cn("px-2 py-2 m-2 pixelify_sans")}  variant="h4" gutterBottom component="div" sx={{ color: 'red', }}>
+      <Typography className={cn("px-2 py-2 m-2 pixelify_sans")}  variant="h4" gutterBottom component="div" sx={{ color: 'blue', }}>
         About Kiosk and Predictrix
       </Typography>
       
