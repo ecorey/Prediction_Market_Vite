@@ -6,10 +6,7 @@ import Button from "@mui/material/Button";
 import { useWallet } from '@suiet/wallet-kit';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { TransactionBlock} from '@mysten/sui.js/transactions';
-import { KioskClient, Network, KioskTransaction } from '@mysten/kiosk';
-import { PACKAGE, CLOCK, GAME_ID } from '../../../scripts/config.ts';
-import { ITEMTYPE, PREDICTION_TWO } from '../../../scripts/config.js'; 
-import { getFullnodeUrl, SuiClient, SuiHTTPTransport } from "@mysten/sui.js/client";
+import { PACKAGE, } from '../../../scripts/config.ts';
 
 
 
@@ -27,16 +24,14 @@ const WithdrawFromKiosk = () => {
   const { connected, account, signAndExecuteTransactionBlock } = useWallet();
 
 
-  const [userPredictionId, setUserPredictionId] = useState('');
+  const [userAmount, setUserAmount] = useState('');
   const [kioskId, setkioskID] = useState('');
   const [kioskOwnerCapId, setOwnerCapId] = useState('');
 
 
   const handleCreateAndPlace = async () => {
 
-    if (!connected || !userPredictionId) {
-        alert("Please connect your wallet and enter a prediction ID.");
-    } 
+   
 
    
 
@@ -56,35 +51,35 @@ const WithdrawFromKiosk = () => {
         
 
         txb.moveCall({
-            target: `${PACKAGE}::predictrix::withdraw`,
+            target: `${PACKAGE}::predictrix::withdraw_from_kiosk`,
             arguments: [
                 txb.object(kioskOwnerCapId),
                 txb.object(kioskId),
-                txb.object(userPredictionId),
+                txb.object(userAmount),
             ],
-            typeArguments: [`${PACKAGE}::predictrix::Prediction`]
+            
         });
 
 
   
-        console.log("Withdraw successfully.");
+        console.log("Withdraw successful.");
 
 
         // Sign and execute transaction block.
         const predictionData = await signAndExecuteTransactionBlock({ transactionBlock: txb });
 
         console.log('Withdraw', predictionData);
-        alert(`Congrats! Withdraw! \n Digest: ${predictionData.digest}`)
+        alert(`Congrats! Withdrawal Successful! \n Digest: ${predictionData.digest}`)
         
         
       } catch (error) {
-        console.error("Error in Withdraw:", error);
+        console.error("Error in Withdrawal:", error);
       }
 
 
 
 
-    setUserPredictionId('');
+    setUserAmount('');
     setkioskID('');
     setOwnerCapId('');
 
@@ -112,7 +107,7 @@ const WithdrawFromKiosk = () => {
       }}>
 
         <Typography variant="h4" gutterBottom >
-          Withdraw Prediction from Your Kiosk
+          Withdraw Amount from Kiosk
         </Typography>
         <TextField
             label="Owner Cap ID"
@@ -167,11 +162,11 @@ const WithdrawFromKiosk = () => {
         />
 
         <TextField
-          label="Prediction ID"
-          placeholder="Enter your prediction ID" 
+          label="Amount"
+          placeholder="Enter Amount to Withdraw" 
           variant="outlined"
-          value={userPredictionId}
-          onChange={(e) => setUserPredictionId(e.target.value)}
+          value={userAmount}
+          onChange={(e) => setUserAmount(e.target.value)}
           sx={{
             mb: 2,
             width: '100%',
@@ -196,7 +191,7 @@ const WithdrawFromKiosk = () => {
           onClick={handleCreateAndPlace}
           disabled={!connected}
         >
-          Withdraw Prediction
+          Withdraw 
         </Button>
       </Box>
     </ThemeProvider>
