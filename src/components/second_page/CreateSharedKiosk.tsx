@@ -34,7 +34,7 @@ const kioskClient = new KioskClient({
 
 
 
-const CreateSharedKiosk = () => {
+const CreateKiosk = () => {
 
   const { connected, account, signAndExecuteTransactionBlock } = useWallet();
 
@@ -106,7 +106,7 @@ const CreateSharedKiosk = () => {
       }}>
 
         <Typography variant="h4" gutterBottom>
-          Create Shared Kiosk 
+          Create Kiosk 
         </Typography>
         
         <Button
@@ -114,11 +114,11 @@ const CreateSharedKiosk = () => {
           onClick={handleCreateAndPlace}
           disabled={!connected}
         >
-           Create Shared Kiosk
+           Create Kiosk
         </Button>
       </Box>
     </ThemeProvider>
   );
 };
 
-export default CreateSharedKiosk;
+export default CreateKiosk;
