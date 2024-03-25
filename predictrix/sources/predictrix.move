@@ -680,8 +680,39 @@ module predictrix::predictrix {
     public fun list_item<Prediction: key + store>(cap: &KioskOwnerCap, kiosk: &mut Kiosk, prediction_id: ID, price: u64){
         kiosk::list<Prediction>(kiosk, cap, prediction_id, price);
     }
-    
 
+
+
+    // review
+    public fun delist_item<Prediction: key + store>(cap: &KioskOwnerCap, kiosk: &mut Kiosk, prediction_id: ID){
+        kiosk::delist<Prediction>(kiosk, cap, prediction_id);
+    }
+
+
+
+    // review
+    public fun take_item<Prediction: key + store>(cap: &KioskOwnerCap, kiosk: &mut Kiosk, prediction_id: ID) : Prediction {
+        let prediction = kiosk::take<Prediction>(kiosk, cap, prediction_id);
+        prediction
+    }
+
+
+    
+    // review
+    public fun purchase_item<Prediction: key + store>( kiosk: &mut Kiosk, prediction_id: ID, coin: Coin<SUI>) : (Prediction, TransferRequest<Prediction>){
+        let (prediction, request) = kiosk::purchase<Prediction>(kiosk, prediction_id, coin);
+        (prediction, request)
+    }
+
+
+
+    // review
+    public fun withdraw_from_kiosk<Prediction: key + store>(cap: &KioskOwnerCap, kiosk: &mut Kiosk, amount: Option<u64>, ctx: &mut TxContext) : Coin<SUI> {
+        
+        let amount_withrawn = kiosk::withdraw(kiosk, cap, amount, ctx); 
+        amount_withrawn
+
+    }
 
 
 
