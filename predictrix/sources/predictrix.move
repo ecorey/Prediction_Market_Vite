@@ -373,6 +373,20 @@ module predictrix::predictrix {
     }
 
 
+    public fun set_predict_epoch_return_val(start_time: u64, end_time: u64, ctx: &mut TxContext) : PredictEpoch   {
+        
+        let predict_epoch  = PredictEpoch {
+            id: object::new(ctx),
+            start_time,
+            end_time,
+        };
+
+        
+        predict_epoch
+
+    }
+
+
 
 
     public fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) {
@@ -387,6 +401,17 @@ module predictrix::predictrix {
 
     }
     
+
+     public fun set_report_epoch_return_val(start_time: u64, end_time: u64, ctx: &mut TxContext) : ReportEpoch {
+        
+        let report_epoch  = ReportEpoch {
+            id: object::new(ctx),
+            start_time,
+            end_time,
+        };
+
+        report_epoch
+    }
 
 
 
@@ -699,10 +724,10 @@ module predictrix::predictrix {
 
     
     // review
-    public fun purchase_item<Prediction: key + store>( kiosk: &mut Kiosk, prediction_id: ID, coin: Coin<SUI>) {
+    public fun purchase_item<Prediction: key + store>( kiosk: &mut Kiosk, prediction_id: ID, coin: Coin<SUI>, ctx: &mut TxContext) : TransferRequest<Prediction> {
         let (prediction, request) = kiosk::purchase<Prediction>(kiosk, prediction_id, coin);
         transfer::public_transfer(prediction, tx_context::sender(ctx));
-        transfer::public_transfer(request, tx_context::sender(ctx));
+        request
     }
 
 

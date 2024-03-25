@@ -373,6 +373,20 @@ module predictrix::predictrix {
     }
 
 
+    public fun set_predict_epoch_return_val(start_time: u64, end_time: u64, ctx: &mut TxContext) : PredictEpoch   {
+        
+        let predict_epoch  = PredictEpoch {
+            id: object::new(ctx),
+            start_time,
+            end_time,
+        };
+
+        
+        predict_epoch
+
+    }
+
+
 
 
     public fun set_report_epoch(start_time: u64, end_time: u64, ctx: &mut TxContext) {
@@ -387,6 +401,17 @@ module predictrix::predictrix {
 
     }
     
+
+     public fun set_report_epoch_return_val(start_time: u64, end_time: u64, ctx: &mut TxContext) : ReportEpoch {
+        
+        let report_epoch  = ReportEpoch {
+            id: object::new(ctx),
+            start_time,
+            end_time,
+        };
+
+        report_epoch
+    }
 
 
 
@@ -683,7 +708,7 @@ module predictrix::predictrix {
 
 
 
-    // review
+    
     public fun delist_item<Prediction: key + store>(cap: &KioskOwnerCap, kiosk: &mut Kiosk, prediction_id: ID){
         kiosk::delist<Prediction>(kiosk, cap, prediction_id);
     }
@@ -699,18 +724,19 @@ module predictrix::predictrix {
 
     
     // review
-    public fun purchase_item<Prediction: key + store>( kiosk: &mut Kiosk, prediction_id: ID, coin: Coin<SUI>) : (Prediction, TransferRequest<Prediction>){
+    public fun purchase_item<Prediction: key + store>( kiosk: &mut Kiosk, prediction_id: ID, coin: Coin<SUI>, ctx: &mut TxContext) : TransferRequest<Prediction> {
         let (prediction, request) = kiosk::purchase<Prediction>(kiosk, prediction_id, coin);
-        (prediction, request)
+        transfer::public_transfer(prediction, tx_context::sender(ctx));
+        request
     }
 
 
 
     // review
-    public fun withdraw_from_kiosk<Prediction: key + store>(cap: &KioskOwnerCap, kiosk: &mut Kiosk, amount: Option<u64>, ctx: &mut TxContext) : Coin<SUI> {
+    public fun withdraw_from_kiosk<Prediction: key + store>(cap: &KioskOwnerCap, kiosk: &mut Kiosk, amount: Option<u64>, ctx: &mut TxContext)  {
         
         let amount_withrawn = kiosk::withdraw(kiosk, cap, amount, ctx); 
-        amount_withrawn
+        transfer::public_transfer(amount_withrawn, tx_context::sender(ctx));
 
     }
 
