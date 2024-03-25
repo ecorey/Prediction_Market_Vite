@@ -2,6 +2,7 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import cn from 'classnames'; 
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { GAME_STATUS } from '../../scripts/config.ts';
 
 
 import { PACKAGE } from '../../scripts/config.ts';
@@ -32,7 +33,7 @@ const GameStatus = () => {
        }}>
 
       <Typography className={cn("px-2 py-2 m-2")}  variant="body1" gutterBottom component="div" sx={{ color: 'white', fontSize: '1.875rem', fontWeight: 'bold' }}>
-        Game OPEN
+        Game: {GAME_STATUS}
       </Typography>
       
       <Typography className={cn("px-2 py-2 m-2 ")}  variant="h4" gutterBottom component="div" sx={{ color: 'red', fontSize: '1.875rem' }} >

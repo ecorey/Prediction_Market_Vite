@@ -683,7 +683,7 @@ module predictrix::predictrix {
 
 
 
-    // review
+    
     public fun delist_item<Prediction: key + store>(cap: &KioskOwnerCap, kiosk: &mut Kiosk, prediction_id: ID){
         kiosk::delist<Prediction>(kiosk, cap, prediction_id);
     }
@@ -699,18 +699,19 @@ module predictrix::predictrix {
 
     
     // review
-    public fun purchase_item<Prediction: key + store>( kiosk: &mut Kiosk, prediction_id: ID, coin: Coin<SUI>) : (Prediction, TransferRequest<Prediction>){
+    public fun purchase_item<Prediction: key + store>( kiosk: &mut Kiosk, prediction_id: ID, coin: Coin<SUI>) {
         let (prediction, request) = kiosk::purchase<Prediction>(kiosk, prediction_id, coin);
-        (prediction, request)
+        transfer::public_transfer(prediction, tx_context::sender(ctx));
+        transfer::public_transfer(request, tx_context::sender(ctx));
     }
 
 
 
     // review
-    public fun withdraw_from_kiosk<Prediction: key + store>(cap: &KioskOwnerCap, kiosk: &mut Kiosk, amount: Option<u64>, ctx: &mut TxContext) : Coin<SUI> {
+    public fun withdraw_from_kiosk<Prediction: key + store>(cap: &KioskOwnerCap, kiosk: &mut Kiosk, amount: Option<u64>, ctx: &mut TxContext)  {
         
         let amount_withrawn = kiosk::withdraw(kiosk, cap, amount, ctx); 
-        amount_withrawn
+        transfer::public_transfer(amount_withrawn, tx_context::sender(ctx));
 
     }
 

@@ -29,7 +29,7 @@ const Purchase = () => {
 
   const [userPredictionId, setUserPredictionId] = useState('');
   const [kioskId, setkioskID] = useState('');
-  const [kioskOwnerCapId, setOwnerCapId] = useState('');
+  const [payment, setPayment] = useState('');
 
 
   const handleCreateAndPlace = async () => {
@@ -53,14 +53,14 @@ const Purchase = () => {
         
         
         txb.setGasBudget(10000000);
-        
 
-        txb.moveCall({
-            target: `${PACKAGE}::predictrix::place_item`,
+
+        await txb.moveCall({
+            target: `${PACKAGE}::predictrix::purchase_item`,
             arguments: [
-                txb.object(kioskOwnerCapId),
                 txb.object(kioskId),
                 txb.object(userPredictionId),
+                txb.object(payment),
             ],
             typeArguments: [`${PACKAGE}::predictrix::Prediction`]
         });
@@ -86,7 +86,7 @@ const Purchase = () => {
 
     setUserPredictionId('');
     setkioskID('');
-    setOwnerCapId('');
+    setPayment('');
 
     
 
@@ -115,11 +115,11 @@ const Purchase = () => {
           Purchase a Prediction from a Kiosk
         </Typography>
         <TextField
-            label="Owner Cap ID"
-            placeholder="Enter your Kiosk Owner Cap ID" 
+            label="Kiosk ID"
+            placeholder="Enter the Kiosk ID" 
             variant="outlined"
-            value={kioskOwnerCapId}
-            onChange={(e) => setOwnerCapId(e.target.value)}
+            value={kioskId}
+            onChange={(e) => setkioskID(e.target.value)}
             sx={{
               mb: 2,
               width: '100%',
@@ -141,11 +141,11 @@ const Purchase = () => {
           />
 
          <TextField
-          label="Kiosk ID"
-          placeholder="Enter your Kiosk ID" 
+          label="Prediction ID"
+          placeholder="Enter prediction ID" 
           variant="outlined"
-          value={kioskId}
-          onChange={(e) => setkioskID(e.target.value)}
+          value={userPredictionId}
+          onChange={(e) => setUserPredictionId(e.target.value)}
           sx={{
             mb: 2,
             width: '100%',
@@ -167,11 +167,11 @@ const Purchase = () => {
         />
 
         <TextField
-          label="Prediction ID"
-          placeholder="Enter your prediction ID" 
+          label="Payment ID"
+          placeholder="Enter payment" 
           variant="outlined"
-          value={userPredictionId}
-          onChange={(e) => setUserPredictionId(e.target.value)}
+          value={payment}
+          onChange={(e) => setPayment(e.target.value)}
           sx={{
             mb: 2,
             width: '100%',
