@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -6,10 +6,7 @@ import Button from "@mui/material/Button";
 import { useWallet } from '@suiet/wallet-kit';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { TransactionBlock} from '@mysten/sui.js/transactions';
-import { KioskClient, Network, KioskTransaction } from '@mysten/kiosk';
-import { PACKAGE, CLOCK, GAME_ID } from '../../../scripts/config.ts';
-import { ITEMTYPE, PREDICTION_TWO } from '../../../scripts/config.js'; 
-import { getFullnodeUrl, SuiClient, SuiHTTPTransport } from "@mysten/sui.js/client";
+import { PACKAGE } from '../../../scripts/config.ts';
 
 
 
@@ -55,29 +52,31 @@ const TakeFromKiosk = () => {
         txb.setGasBudget(10000000);
         
 
-        txb.moveCall({
-            target: `${PACKAGE}::predictrix::place_item`,
+        let prediction = txb.moveCall({
+            target: `${PACKAGE}::predictrix::take_item`,
             arguments: [
-                txb.object(kioskOwnerCapId),
                 txb.object(kioskId),
+                txb.object(kioskOwnerCapId),
                 txb.object(userPredictionId),
             ],
             typeArguments: [`${PACKAGE}::predictrix::Prediction`]
         });
 
+        console.log(prediction);
 
   
-        console.log("Prediction placed successfully.");
+        console.log("Prediction taken successfully.");
 
 
         // Sign and execute transaction block.
-        await signAndExecuteTransactionBlock({ transactionBlock: txb });
+        const predictionData = await signAndExecuteTransactionBlock({ transactionBlock: txb });
 
-        console.log(account?.address)
+        console.log('Prediction taken!', predictionData);
+        alert(`Congrats! Your prediction has been taken! \n Digest: ${predictionData.digest}`)
         
         
       } catch (error) {
-        console.error("Error in placing prediction:", error);
+        console.error("Error in taking prediction:", error);
       }
 
 
@@ -114,11 +113,11 @@ const TakeFromKiosk = () => {
           Take Prediction from Your Kiosk
         </Typography>
         <TextField
-            label="Owner Cap ID"
-            placeholder="Enter your Kiosk Owner Cap ID" 
+            label="Kiosk ID"
+            placeholder="Enter your Kiosk ID" 
             variant="outlined"
-            value={kioskOwnerCapId}
-            onChange={(e) => setOwnerCapId(e.target.value)}
+            value={kioskId}
+            onChange={(e) => setkioskID(e.target.value)}
             sx={{
               mb: 2,
               width: '100%',
@@ -140,11 +139,11 @@ const TakeFromKiosk = () => {
           />
 
          <TextField
-          label="Kiosk ID"
-          placeholder="Enter your Kiosk ID" 
+          label="Kiosk Owner Cap ID"
+          placeholder="Enter your Kiosk Owner Cap ID" 
           variant="outlined"
-          value={kioskId}
-          onChange={(e) => setkioskID(e.target.value)}
+          value={kioskOwnerCapId}
+          onChange={(e) => setOwnerCapId(e.target.value)}
           sx={{
             mb: 2,
             width: '100%',

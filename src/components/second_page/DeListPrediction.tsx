@@ -35,7 +35,7 @@ const DeListPrediction = () => {
   const handleCreateAndPlace = async () => {
 
     if (!connected || !userPredictionId) {
-        alert("Please connect your wallet and enter a prediction ID.");
+        alert("Please connect your wallet and enter needed info.");
     } 
 
    
@@ -56,7 +56,7 @@ const DeListPrediction = () => {
         
 
         txb.moveCall({
-            target: `${PACKAGE}::predictrix::place_item`,
+            target: `${PACKAGE}::predictrix::delist_item`,
             arguments: [
                 txb.object(kioskOwnerCapId),
                 txb.object(kioskId),
@@ -67,17 +67,18 @@ const DeListPrediction = () => {
 
 
   
-        console.log("Prediction placed successfully.");
+        console.log("Prediction delisted successfully.");
 
 
         // Sign and execute transaction block.
-        await signAndExecuteTransactionBlock({ transactionBlock: txb });
+        const predictionData = await signAndExecuteTransactionBlock({ transactionBlock: txb });
 
-        console.log(account?.address)
+        console.log('Prediction delisted!', predictionData);
+        alert(`Congrats! Your prediction has been delisted! \n Digest: ${predictionData.digest}`)
         
         
       } catch (error) {
-        console.error("Error in placing prediction:", error);
+        console.error("Error in delisting prediction:", error);
       }
 
 

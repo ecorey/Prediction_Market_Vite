@@ -71,9 +71,10 @@ const PlacePrediction = () => {
 
 
         // Sign and execute transaction block.
-        await signAndExecuteTransactionBlock({ transactionBlock: txb });
+        const predictionData = await signAndExecuteTransactionBlock({ transactionBlock: txb });
 
-        console.log(account?.address)
+        console.log('Prediction listed!', predictionData);
+        alert(`Congrats! Your prediction has been placed! \n Digest: ${predictionData.digest}`);
         
         
       } catch (error) {

@@ -44,13 +44,8 @@ function SecondPage() {
                     </Grid>
                 )}
 
-                {/* {connected && (
-                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <CreatePlace /> 
-                    </Grid>
-                )} */}
-
                 
+
                 {connected && (
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
                     <ListPrediction /> 
@@ -65,26 +60,25 @@ function SecondPage() {
                 )}
 
 
-                {connected && (
+                {/* {connected && (
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
                     <TakeFromKiosk /> 
                     </Grid>
-                )}
+                )} */}
 
 
                 
-
                 {connected && (
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
                     <Purchase /> 
                     </Grid>
                 )}
 
-                {/* {connected && (
+                {connected && (
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
                     <WithdrawFromKiosk /> 
                     </Grid>
-                )} */}
+                )}
 
                 
 

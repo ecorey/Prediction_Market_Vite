@@ -28,8 +28,9 @@ const ListPrediction = () => {
 
 
   const [userPredictionId, setUserPredictionId] = useState('');
-  const [kioskId, setkioskID] = useState('');
-  const [kioskOwnerCapId, setOwnerCapId] = useState('');
+  const [kioskId, setkioskID] = useState(''); 
+  const [kioskOwnerCapId, setOwnerCapId] = useState(''); 
+  const [userListPrice, setListPrice] = useState('');
 
 
   const handleCreateAndPlace = async () => {
@@ -56,28 +57,30 @@ const ListPrediction = () => {
         
 
         txb.moveCall({
-            target: `${PACKAGE}::predictrix::place_item`,
+            target: `${PACKAGE}::predictrix::list_item`,
             arguments: [
                 txb.object(kioskOwnerCapId),
                 txb.object(kioskId),
                 txb.object(userPredictionId),
+                txb.pure.u64(userListPrice),
             ],
             typeArguments: [`${PACKAGE}::predictrix::Prediction`]
         });
 
 
   
-        console.log("Prediction placed successfully.");
+        console.log("Prediction listed successfully.");
 
 
         // Sign and execute transaction block.
-        await signAndExecuteTransactionBlock({ transactionBlock: txb });
+        const predictionData = await signAndExecuteTransactionBlock({ transactionBlock: txb });
 
-        console.log(account?.address)
+        console.log('Prediction listed!', predictionData);
+        alert(`Congrats! Your prediction has been listed! \n Digest: ${predictionData.digest}`);
         
         
       } catch (error) {
-        console.error("Error in placing prediction:", error);
+        console.error("Error in listing prediction:", error);
       }
 
 
@@ -190,6 +193,33 @@ const ListPrediction = () => {
             },
           }}
         />
+
+        <TextField
+          label="List Price"
+          placeholder="Enter your list price" 
+          variant="outlined"
+          value={userListPrice}
+          onChange={(e) => setListPrice(e.target.value)}
+          sx={{
+            mb: 2,
+            width: '100%',
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "white", 
+              },
+              "&:hover fieldset": {
+                borderColor: "lightblue", 
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "lightblue", 
+              },
+            },
+            "& .MuiInputBase-input": {
+              color: "white", 
+            },
+          }}
+        />
+
         <Button
           variant="contained"
           onClick={handleCreateAndPlace}

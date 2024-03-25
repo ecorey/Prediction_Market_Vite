@@ -56,7 +56,7 @@ const WithdrawFromKiosk = () => {
         
 
         txb.moveCall({
-            target: `${PACKAGE}::predictrix::place_item`,
+            target: `${PACKAGE}::predictrix::withdraw`,
             arguments: [
                 txb.object(kioskOwnerCapId),
                 txb.object(kioskId),
@@ -67,17 +67,18 @@ const WithdrawFromKiosk = () => {
 
 
   
-        console.log("Prediction placed successfully.");
+        console.log("Withdraw successfully.");
 
 
         // Sign and execute transaction block.
-        await signAndExecuteTransactionBlock({ transactionBlock: txb });
+        const predictionData = await signAndExecuteTransactionBlock({ transactionBlock: txb });
 
-        console.log(account?.address)
+        console.log('Withdraw', predictionData);
+        alert(`Congrats! Withdraw! \n Digest: ${predictionData.digest}`)
         
         
       } catch (error) {
-        console.error("Error in placing prediction:", error);
+        console.error("Error in Withdraw:", error);
       }
 
 
@@ -107,7 +108,7 @@ const WithdrawFromKiosk = () => {
         borderRadius: '4px',
         m: 1,
         width: '100%',
-        color: 'blue',
+        color: 'white',
       }}>
 
         <Typography variant="h4" gutterBottom >

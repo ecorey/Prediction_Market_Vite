@@ -7,20 +7,20 @@
 export const CLOCK = "0x6";
 
 
-export const DEV_WALLET = "";
-export const PACKAGE_PUBLISHER_WALLET = "";
+export const DEV_WALLET = "0x07095af51002db0e9be284b8dab97263f77fec2a1be68cd42b7dd2358a6eccdd";
+export const PACKAGE_PUBLISHER_WALLET = "0x07095af51002db0e9be284b8dab97263f77fec2a1be68cd42b7dd2358a6eccdd";
 
-export const WALLET_SUIET = "0x8765e12c4e37aa222a40986bb3d8b893d1c0b3483b617974954e9d860436506f";
+export const WALLET_SUIET = "0xe25279799fd64f19e85281ff06856a6807a24bf6324e196dd37dbbe3e36e1aa4";
 
 // created in init
-export const PACKAGE = "0x1b5ae8038ba36cc296c6185f6f92edbea678310066d4cf0e96979bdf54fba6ab";
-export const START_GAME_CAP = "0x767fda4bcc6799070108944b1b364d10feb75c44d5b1259e51ef64c5a6c302ec";
-export const END_GAME_CAP = "0x63e0504b75be99e6948ac5d5470e711339045d735864cbee7078abbac7273dc3";
-export const GAME_OWNER_CAP = "0xa480d290ff097a14bcc4752ab19a035d0b6a482d9578542831af3c25bb4b8ea2";
-export const TRANSFER_POLICY  = "";
-export const TRANSFER_POLICY_CAP = "";
-export const PUBLISHER = "";
-export const UPGRADE_CAP = "";
+export const PACKAGE = "0x779419ea802178ae46d513a33ad59b28f649192d1ed9525c13bbe92df572e1ce";
+export const START_GAME_CAP = "0x95b64ec6606ed99aad2e0c5e86dff25a4fe189cb85afc8cc6612d7e45d4c98f6";
+export const END_GAME_CAP = "0xadc09a29921ac6a0ba9337ffc91be39aa81bbd74b4c5343276f0ff0315698fde";
+export const GAME_OWNER_CAP = "0xf398747e62ec83e17eb7ea403c4584d276cc1169d26b82390746957dbb02fddc";
+export const TRANSFER_POLICY  = "0x6c3d7374cc9edfb0beebe9ba3725ffc47fb5a97914795838366d3a6cfe01e0cd";
+export const TRANSFER_POLICY_CAP = "0x7a3216c16612d3d92a085702f44138570d5dbd956d8c1411aa0018c7ef7710b5";
+export const PUBLISHER = "0x88ad4e97d716257ed1008c1afe850acb5b9aecdec2268ed596905dde002548b8";
+export const UPGRADE_CAP = "0xdac78de977bd031ec2423a0ec67f6b7e10d733d1597132723f85e8e7aa6843af";
 export const ITEMTYPE = `${PACKAGE}::predictrix::Prediction`;
 
 
@@ -36,20 +36,20 @@ export const GAME_PRICE = "1000000";
 // 1 hour + 3,600,000 ms
 // (election event on Nov. 5)
 // get from get time event log
-export const PREDICT_START_TIME = 1711312087278;
+export const PREDICT_START_TIME = 1711326058467;
 
 // November 3, 2024, at 12:00 AM (GMT)
-export const PREDICT_END_TIME = 1711313287278;
+export const PREDICT_END_TIME = 1711326058467;
 
 // November 10, 2024 at 12:00 AM (GMT)
-export const REPORT_START_TIME = 1711313287278;
+export const REPORT_START_TIME = 1711326058467;
 
 // February 2, 2024, at 12:00 AM (GMT)
 export const REPORT_END_TIME = 1822309897994;
 
 
-export const PREDICT_EPOCH = "0x3e26130ee369861b42b886e8b2f2a68777413016736eaeafda7df99c81ab27b3";
-export const REPORT_EPOCH = "0x390f26986c612b346bd2e18b8b19be5acb5d5e9a26863f0289676fb5a3bd43a6";
+export const PREDICT_EPOCH = "0xb2f827b4b11fa523dcf4c28c69482a3c3816b16a35061c2fa4c53a97283ae71b";
+export const REPORT_EPOCH = "0xe384dbf3ed881c081e16decc7c7958cb155506235489817f1e5793f774c2600d";
 
 
 export const IS_GAME_OPEN = true;
@@ -57,7 +57,7 @@ export const IS_GAME_OPEN = true;
 
 //CLOSE GAME SCRIPT
 // game id
-export const GAME_ID = "0x5130c9f8ec561ea96eddbe4792c025ef879435aca8806dde59411b0a47fcae0a";
+export const GAME_ID = "0xfccf49ddbe4642a7e13db822cb78276df7d123e44750efce2f960b30dc98c6aa";
 
 
 
@@ -73,8 +73,8 @@ export const GAME_RESULT = "444";
 
 
 // PREDCITION SCRIPT MADE BY USER ***
-export const PREDICTION = "0xa216f250d1616f2e7b4e66ec81b5583b9e24fbc8c9315a45ac049578f6d8c4fb";
-export const PREDICTION_ID = "0xa216f250d1616f2e7b4e66ec81b5583b9e24fbc8c9315a45ac049578f6d8c4fb";
+export const PREDICTION = "0x8d1cc8e286d919d0431669ba249dc15378c0392e4615e7043347e38507d77933";
+export const PREDICTION_ID = "0x8d1cc8e286d919d0431669ba249dc15378c0392e4615e7043347e38507d77933";
 
 export const PREDICTION_TWO = "";
 
@@ -84,8 +84,8 @@ export const GUESS = 444;
 
 
 // KIOSK SCRIPT
-export const KIOSK = "0x0c8c105417548e2384006e89189bd50e6bf0bfa748b862209fb9552dab927080";
-export const KIOSK_OWNER_CAP = "0xfcfb9f1b88cfc999b0b5eaf6e46d3db1eadcbb47557603ef112e5e50dc20d580";
+export const KIOSK = "0x2ba36f9e1f26eb872245b1e808df98e0bd23afa0de4dee2b433ee734e4cd0594";
+export const KIOSK_OWNER_CAP = "0x771a61b03466fdeb20eff1d9370068b84a3147de5c8211b1e897706ad2645277";
 
 
 

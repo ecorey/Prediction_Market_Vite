@@ -67,17 +67,18 @@ const Purchase = () => {
 
 
   
-        console.log("Prediction placed successfully.");
+        console.log("Prediction purchased successfully.");
 
 
         // Sign and execute transaction block.
-        await signAndExecuteTransactionBlock({ transactionBlock: txb });
+        const predictionData = await signAndExecuteTransactionBlock({ transactionBlock: txb });
 
-        console.log(account?.address)
+        console.log('Prediction purchased!', predictionData);
+        alert(`Congrats! Your prediction has been purchased! \n Digest: ${predictionData.digest}`)
         
         
       } catch (error) {
-        console.error("Error in placing prediction:", error);
+        console.error("Error in purchasing prediction:", error);
       }
 
 
