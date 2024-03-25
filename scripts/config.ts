@@ -7,14 +7,14 @@
 export const CLOCK = "0x6";
 
 
-export const DEV_WALLET = "";
-export const PACKAGE_PUBLISHER_WALLET = "";
+export const DEV_WALLET = "0x23747674cd70eab24ce7066ffc1212dc7da422cb6b77fa6a34f3eabefeafb867";
+export const PACKAGE_PUBLISHER_WALLET = "0x23747674cd70eab24ce7066ffc1212dc7da422cb6b77fa6a34f3eabefeafb867";
 
 export const WALLET_SUIET = "";
 
 
 
-export const WALLET_SUIET_TWO = "";
+export const WALLET_SUIET_TEN = "";
 
 // created in init
 export const PACKAGE = "";
@@ -40,13 +40,13 @@ export const GAME_PRICE = "1000000";
 // 1 hour + 3,600,000 ms
 // (election event on Nov. 5)
 // get from get time event log
-export const PREDICT_START_TIME = 1711340154845;
+export const PREDICT_START_TIME = 1711380123562;
 
 // November 3, 2024, at 12:00 AM (GMT)
-export const PREDICT_END_TIME = 1711340754845;
+export const PREDICT_END_TIME = 1711381023562;
 
 // November 10, 2024 at 12:00 AM (GMT)
-export const REPORT_START_TIME = 1711340754845;
+export const REPORT_START_TIME = 1711381023562;
 
 // February 2, 2024, at 12:00 AM (GMT)
 export const REPORT_END_TIME = 1822309897994;
@@ -56,13 +56,12 @@ export const PREDICT_EPOCH = "";
 export const REPORT_EPOCH = "";
 
 
+// GAME SCRIPT
 export const IS_GAME_OPEN = true;
+export const GAME_STATUS = "CLOSED";
 
-
-//CLOSE GAME SCRIPT
 // game id
 export const GAME_ID = "";
-export const GAME_STATUS = "CLOSED";
 
 
 
@@ -74,7 +73,7 @@ export const COIN_TO_ADD = "";
 
 // GAME RESULT SCRIPT
 export const GAME_RESULT = "444";
-
+export const GUESS = 444;
 
 
 // PREDCITION SCRIPT MADE BY USER ***
@@ -84,7 +83,6 @@ export const PREDICTION_ID = "";
 export const PREDICTION_TWO = "";
 
 
-export const GUESS = 444;
 
 
 
@@ -95,6 +93,7 @@ export const KIOSK_OWNER_CAP_WALLET_ONE = "";
 
 export const KIOSK_WALLET_TWO = "";
 export const KIOSK_OWNER_CAP_WALLET_TWO = "";
+
 
 
 

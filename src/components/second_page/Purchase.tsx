@@ -7,7 +7,7 @@ import { useWallet } from '@suiet/wallet-kit';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { TransactionBlock} from '@mysten/sui.js/transactions';
 import { KioskClient, Network, KioskTransaction } from '@mysten/kiosk';
-import { PACKAGE, CLOCK, GAME_ID } from '../../../scripts/config.ts';
+import { PACKAGE, CLOCK, GAME_ID, TRANSFER_POLICY } from '../../../scripts/config.ts';
 import { ITEMTYPE, PREDICTION_TWO } from '../../../scripts/config.js'; 
 import { getFullnodeUrl, SuiClient, SuiHTTPTransport } from "@mysten/sui.js/client";
 
@@ -55,7 +55,7 @@ const Purchase = () => {
         txb.setGasBudget(10000000);
 
 
-        await txb.moveCall({
+        let request = await txb.moveCall({
             target: `${PACKAGE}::predictrix::purchase_item`,
             arguments: [
                 txb.object(kioskId),
@@ -66,14 +66,16 @@ const Purchase = () => {
         });
 
 
+      
+
   
         console.log("Prediction purchased successfully.");
 
 
         // Sign and execute transaction block.
-        const predictionData = await signAndExecuteTransactionBlock({ transactionBlock: txb });
+        const predictionData = await signAndExecuteTransactionBlock({ transactionBlock: txb  });
 
-        console.log('Prediction purchased!', predictionData);
+        console.log('Prediction purchased!', request);
         alert(`Congrats! Your prediction has been purchased! \n Digest: ${predictionData.digest}`)
         
         
