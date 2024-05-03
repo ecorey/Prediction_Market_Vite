@@ -26,6 +26,12 @@ At the appropriate time the game admin can close the game. After the game is clo
 
 
 
+
+---
+---
+---
+
+
 [Presentation](https://vimeo.com/942519376?share=copy)
 
 
