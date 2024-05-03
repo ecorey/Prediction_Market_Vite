@@ -20,7 +20,7 @@ import wallet from './dev-wallet.json' assert { type: 'json' };
 
 
 // generate a keypair from mnemonic
-const exampleMnemonic = '';
+const exampleMnemonic = 'rifle blouse fiber brush enrich twelve message squirrel bless daring van enjoy';
  
 const keyPair_one = Ed25519Keypair.deriveKeypair(exampleMnemonic);
 

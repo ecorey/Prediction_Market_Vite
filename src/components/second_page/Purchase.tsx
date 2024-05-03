@@ -30,6 +30,7 @@ const Purchase = () => {
   const [userPredictionId, setUserPredictionId] = useState('');
   const [kioskId, setkioskID] = useState('');
   const [payment, setPayment] = useState('');
+  const [transfer_policy, setTransferPolicy] = useState('');
 
 
   const handleCreateAndPlace = async () => {
@@ -56,11 +57,12 @@ const Purchase = () => {
 
 
         let request = await txb.moveCall({
-            target: `${PACKAGE}::predictrix::purchase_item`,
+            target: `${PACKAGE}::predictrix::buy_listed_item`,
             arguments: [
                 txb.object(kioskId),
                 txb.object(userPredictionId),
                 txb.object(payment),
+                txb.object(transfer_policy),
             ],
             typeArguments: [`${PACKAGE}::predictrix::Prediction`]
         });
@@ -174,6 +176,31 @@ const Purchase = () => {
           variant="outlined"
           value={payment}
           onChange={(e) => setPayment(e.target.value)}
+          sx={{
+            mb: 2,
+            width: '100%',
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "white", 
+              },
+              "&:hover fieldset": {
+                borderColor: "lightblue", 
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "lightblue", 
+              },
+            },
+            "& .MuiInputBase-input": {
+              color: "white", 
+            },
+          }}
+        />
+        <TextField
+          label="Transfer Policy ID"
+          placeholder="Enter Transfer Policy ID" 
+          variant="outlined"
+          value={transfer_policy}
+          onChange={(e) => setTransferPolicy(e.target.value)}
           sx={{
             mb: 2,
             width: '100%',
