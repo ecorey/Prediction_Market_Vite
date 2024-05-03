@@ -2,7 +2,6 @@
 # Predictrix Sui Move Predictive Market Game using Kiosk
 
 
-[Presentation](https://vimeo.com/942519376?share=copy)
 
 
 
@@ -23,3 +22,14 @@ After a user has placed a prediction and has the prediction object in their wall
 
 
 At the appropriate time the game admin can close the game. After the game is closed the game status is reflected on the front end is changed to closed. When the game is closed the function will call the switchboard oracle that contains the result. The result is pulled from an aggregate of .gov sites after a winner is clearly and officially determined. 
+
+
+
+
+[Presentation](https://vimeo.com/942519376?share=copy)
+
+
+
+---
+---
+---
